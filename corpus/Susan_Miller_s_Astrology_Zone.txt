@@ -1,0 +1,3 @@
+Astrology Zone brings your daily horoscopes from Susan Miller to Alexa.
+You can hear a horoscope for today or tomorrow for any sign requested.
+To start, try saying, "Alexa, ask Astrology Zone for the horoscope for Pisces Today".

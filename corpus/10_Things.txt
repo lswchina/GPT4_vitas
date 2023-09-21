@@ -1,0 +1,7 @@
+This skill pulls ten Wikipedia articles at random using the native "Random article" link on the site.
+It then cuts each down to the first sentence, which is typically the most informative as to what a given person/thing/place etc. can be described as.
+The logic eliminates category pages, redirects and other special pages, so you should get ten straightforward declarative statements.
+Because the "things" are drawn at random from the entire body of human knowledge, it is hit or miss whether each is especially interesting or useful.
+Still, opening this skill once or twice a day is a nice distraction.
+Every now and then, you hit on something really interesting and wind up down a rabbit hole of research.
+It's fun!

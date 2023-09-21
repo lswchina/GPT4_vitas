@@ -1,0 +1,2 @@
+Provides information about the Cardano platform.
+Ask for token prices like Ada or Traxia, current epoch / slot, when Shelley or Ledger is expected to arrive.

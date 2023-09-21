@@ -1,0 +1,12 @@
+The MyRadar NOAA Weather Radar skill brings the ease of use and accuracy of the wildly popular smartphone app to the Amazon Echo Show!
+Along with animated radar and detailed weather forecasts, users can track when it will rain and stay ahead of the storm.
+The MyRadar skill also provides current conditions and forecast information based on location such as high/low temperatures, wind speed, hourly forecast and much more!
+To get started, give these requests a try!
+- "Alexa, ask MyRadar to show me the radar.
+- "Alexa, ask MyRadar to show me the radar for Dallas, Texas."
+- "Alexa, ask MyRadar for the weather in Key West, Florida."
+- "Alexa, ask MyRadar for the weekend weather in Charlotte, North Carolina."
+- "Alexa, ask MyRadar for Thursday's temperature."
+- "Alexa, ask MyRadar for the wind forecast in Portland, Oregon."
+There are SO MANY more requests users can make too - from wind speed/direction, sunrise/sunset time, feels like temperature, the chance of snow/rain, cloud cover, UV index, the chance of rain within the next hour
+give them a try!

@@ -1,0 +1,16 @@
+1-2-3 Math is a math challenge which tests your elementary mathematics skills, including addition, subtraction, multiplication, division, comparison, etc.
+There are three modes easy, medium and hard with increasing levels of difficulty.
+We store the state of your game throughout the day.
+So, if you can't answer the question within the allotted time, you can always come back when you are ready and continue from where you left off.
+You get one point for every correct question.
+Scores are calculated for each difficulty level separately.
+Check back regularly to maintain your lead in the game. All scores are reset at the end of the day. 
+Extension Packs:
+This skill offers one time purchases of premium content in the form of extension packs.
+These extension packs increase the variety of questions in the respective difficulty level. 
+Here are the things you can say, once you initialize the skill.
+Repeat/Say Again - To hear the question again
+Help - To get detailed instructions
+Score - To get today's scores
+Change Level  to Easy/Medium/Hard - To change the difficulty level to one of the options
+Good luck!

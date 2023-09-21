@@ -1,0 +1,7 @@
+The Todoist skill lets you manage your Todoist task list with your voice.
+Simply Ask Alexa to add new tasks or to read out your tasks.
+All you need is a Todoist account, so sign up at todoist.com.
+All the Todoist tasks you have due today will be added to your Alexa to-do list each morning
+All the tasks on your Alexa to-do list will be added to your Todoist inbox with today's due date
+All the tasks in your Todoist "Alexa Shopping List" project will automatically be added to your Alexa Shopping List and vice versa
+Any tasks you edit, complete or delete in Todoist will be automatically updated on your Alexa to-do list and vice versa

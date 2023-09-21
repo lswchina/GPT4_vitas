@@ -1,0 +1,19 @@
+This skill adds voice and gesture control capabilities to your 3D Printer.
+Account Linking:
+On the first use the skill will ask you to link the skill with your Amazon account.
+Use the Link Account card displayed in the Alexa mobile / web app to do this.
+First Use:
+When you will use the skill at the first time with your newly linked account, a 3d-printer AWS IoT thing will be created for you automatically.
+You will receive a welcome email with the details needed (thing name + certificates) to run the client application on the Raspberry Pi
+Hardware Setup:
+You will need to connect a Raspberry Pi and a Walabot maker (optional) to your 3D printer.
+For this follow the instruction from:
+https://www.hackster.io/bluetiger9/alexa-walabot-controlled-smart-3d-printer-45a5c2
+Functionality / Intents:
+"Alexa, ask three d. printer to turn on"
+"Alexa, ask three d. printer to turn off"
+"Alexa, ask three d. printer to auto home all axes"
+"Alexa, ask three d. printer to enable Walabot gesture control"
+"Alexa, ask three d. printer to disable Walabot gesture control"
+"Alexa, ask three d. printer to preheat for PLA/ABS/PETG printing"
+"Alexa, ask three d. printer to start printing from SD card"

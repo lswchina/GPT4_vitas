@@ -1,0 +1,4 @@
+Wear Assistant is an Alexa Skill that help you in order to decide what you should wear today, based on the weather forecast.
+Specify the city where you are living or where you are traveling to.
+Wear assistant will tell you useful tips of how to wear, based on the temperature and on the weather phenomenas.
+Wear Assistant uses the OpenWeatherMap APIs (https://openweathermap.org/api) to check the weather.

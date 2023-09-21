@@ -1,0 +1,6 @@
+This is small skill that Alexa performs.
+When you ask Alexa "Open Eyes On You", Alexa will ask you for a person's name.
+Then after you respond Alexa will respond by repeating the person's name and saying "Alexa is watching you".
+That's it.
+Don't be fooled like my wife, Alexa really can't watch somebody.
+This is just a goofy skill that I created so that my kids would think that someone is watching them so that they would behave.

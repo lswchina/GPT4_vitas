@@ -1,0 +1,2 @@
+The Bible skill will read Bible passages of your choosing, or else select a random, popular scripture for you.
+The King James version of the Bible is used.
