@@ -113,12 +113,12 @@ class askChatGPT:
         else:
             print("Step1_User_2:\n" + promptBody2)
             state2 = input("Step1_GPT4_2:\n")
+        self.__record_result(self.__Step1_Recorder_Path, "GPT4:\n" + state2 + "\n")
         if state2 not in state_list:
             if errorMessage == 'not_exist' or errorMessage == 'wrong':
                 return skill_output
             else:
                 return errorMessage
-        self.__record_result(self.__Step1_Recorder_Path, "GPT4:\n" + state2 + "\n")
         return state2
 
     def step2_chat(self, Ques):
@@ -388,18 +388,18 @@ class askChatGPT:
         return better_inputs
 
     def __getPromptGlobal3(self):
-        step3_Example = {'''<current state>="Say today's deals to get started.",FSM={Σ={"stop":0,"help":0,"today's deals":0},δ=()}''': ['''No input event leads to repeated/error state.Now we have ["stop","help","today's deals"].From never invoked input events ["stop","help","today's deals"],we retain "today's deals" as it is most likely to trigger new states. Now we only have "today's deals", so we choose it.''', '"today\'s deals"'],
-                        '''<current state>="You can choose a part type like ssd, hdd, cpu, or pick one from the list in the skill's description.",FSM={Σ={"stop":0,"help":0,"ssd":1,"hdd":1,"cpu":0,"today's deals":1},δ=([<current state>,"today's deals",<current state>])}.''': ['''"today's deals" leads to a repeated state, so it is discarded.Now we have ["stop","help","ssd","hdd","cpu"].From never invoked input events["stop","help","cpu"],we retain "cpu" as it is most likely to trigger new states.Now we have ["ssd","hdd","cpu"] left."cpu" is never invoked, so we choose it.''', '"cpu"']
+        step3_Example = {'''<current state>="Say today's deals to get started.",FSM={Σ={"stop":0,"help":0,"today's deals":0},δ=()}''': ['''inputs after step1:["stop","help","today's deals"]. inputs after step 2:["today's deals"]. step 3:choose "today\'s deals"''', '"today\'s deals"'],
+                        '''<current state>="You can choose a part type like ssd, hdd, cpu, or pick one from the list in the skill's description.",FSM={Σ={"stop":0,"help":0,"ssd":1,"hdd":1,"cpu":0,"today's deals":1},δ=([<current state>,"today's deals",<current state>])}.''': ['''inputs after step1:["stop","help","ssd","hdd","cpu"]. inputs after step2:["ssd","hdd","cpu"] left. step3:choose "cpu".''', '"cpu"']
                         }
         
         self.__promptGlobal3 = "We use a finite state machine to represent an Alexa Skill's behavior. "
         self.__promptGlobal3 = self.__promptGlobal3 + "Our FSM has Q representing the state set, Σ representing the input event dictionary(with key of input event and value of its invocation times) and δ represent the transition set. "
         self.__promptGlobal3 = self.__promptGlobal3 + "The transition from <current state> to <next state> by <input1> is represented as [<current state>, <input1>, <next state>]. "
-        self.__promptGlobal3 = self.__promptGlobal3 + "If <next state> is the same as <current state>, <input1> leads to a repeated state. "
+        self.__promptGlobal3 = self.__promptGlobal3 + "If <next state> = <current state>, <input1> leads to a repeated state. "
         self.__promptGlobal3 = self.__promptGlobal3 + "If <next state> contains error information, <input1> leads to an error state.\n"
         
-        self.__promptGlobal3 = self.__promptGlobal3 + "We map the skill's outputs to states and users' inputs to input events. "
-        self.__promptGlobal3 = self.__promptGlobal3 + "The process of skills taking an input and giving new outputs are mapped to transitions in the FSM. "
+        # self.__promptGlobal3 = self.__promptGlobal3 + "We map the skill's outputs to states and users' inputs to input events. "
+        # self.__promptGlobal3 = self.__promptGlobal3 + "The process of skills taking an input and giving new outputs are mapped to transitions in the FSM. "
         self.__promptGlobal3 = self.__promptGlobal3 + "Given the FSM and the current state, please choose an input event that is most likely to help us discover new states.\n"
 
         self.__promptGlobal3 = self.__promptGlobal3 + "The procedure contains 3 steps.\n"
@@ -473,8 +473,25 @@ class askChatGPT:
         candidate_input_set_to_weight = {}
         for i in candidate_input_list:
             candidate_input_set_to_weight[i] = 4
-        prompt = "<current state> = \"" + state + "\", "
-        prompt = prompt + "<transition from current state> = " + str(transitions) + ", "
+        prompt = '<current state>="' + state + '",'
+        prompt = prompt + "FSM={Σ={"
+        for ind, Inpt in enumerate(candidate_Inpt_list):
+            if ind != 0:
+                prompt = prompt + ","
+            prompt = prompt + '"' + Inpt.get_input() + '":' + str(Inpt.get_times())
+        prompt = prompt + "},δ=("
+        ind2 = 0
+        for input in transitions.keys():
+            if ind2 != 0:
+                prompt = prompt + ','
+            prompt = prompt + '[<current_state>,"' + input + '",'
+            next_state = transitions[input]
+            if next_state == state:
+                prompt = prompt + "<current_state>]"
+            else:
+                prompt = prompt + '"' + next_state + '"]'
+            ind2 = ind2 + 1
+        prompt = prompt + ")}."
         state_info = states[state]
         for input in transitions.keys():
             if input not in candidate_input_list:
@@ -488,7 +505,6 @@ class askChatGPT:
                 candidate_input_set_to_weight[input] -= 2
             elif next_state_info[1] < state_info[1]:
                 candidate_input_set_to_weight[input] -= 1
-        prompt = prompt + "<input event information> = " + str(candidate_Inpt_list) + "."
         return prompt, candidate_input_set_to_weight
 
     def __gen_prompt_for_step3_nl(self, states, state, transitions, candidate_input_set, candidate_input_list):

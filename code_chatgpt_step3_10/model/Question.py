@@ -34,6 +34,12 @@ class Question():
 
     def getInputs(self):
         return self.__Inpt_list
+    
+    def get_inputSet(self):
+        inputSet = set()
+        for Inpt in self.__Inpt_list:
+            inputSet.add(Inpt.get_input())
+        return inputSet
 
     def getState(self):
         return self.__state

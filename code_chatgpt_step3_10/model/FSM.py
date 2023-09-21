@@ -53,6 +53,8 @@ class FSM():
         return None
 
     def __isErrorState(self, questions):
+        if len(questions) == 0 or (len(questions) == 1 and questions[0] == ""):
+            return True
         error_list = ["sorry", "error", "try again", "say again"]
         for ques in questions:
             ques_lower = ques.lower()
@@ -66,7 +68,6 @@ class FSM():
         if lastQ == None:
             last_state = "<START>"
             self.__stateToInfo[last_state] = [False, 0]
-            lastQ.setState("<START>")
         else:
             last_state = lastQ.getState()
 
@@ -111,7 +112,7 @@ class FSM():
                 self.__transitions[last_last_state] = {}
             if self.__transitions[last_last_state].get(last_last_Ques, None) == None:
                 self.__transitions[last_last_state][last_last_Ques] = {}
-            self.__transitions[last_last_state][last_last_Ques][last_last_Inpt] = last_state #add to self.transitions now
+            self.__transitions[last_last_state][last_last_Ques][last_last_Inpt.get_input()] = last_state #add to self.transitions now
             self.__find_last_state.pop(lastQ)
             self.__find_last_Inpt.pop(lastQ)
             self.__find_lastQ.pop(lastQ)
@@ -122,26 +123,31 @@ class FSM():
         if state_need_check == True:
             state1 = self.__checkTransitionsToUpdateState(lastQ, lastI, Ques, last_state, state)
             if state1 == state:
-                lastQ.addReward(1)
+                if lastQ != None:
+                    lastQ.addReward(1)
             else: #state merged
-                lastQ.addReward(-1)
+                if lastQ != None:
+                    lastQ.addReward(-1)
                 state = state1
         return state
 
     def __checkTransitionsToUpdateState(self, lastQ, lastI, Ques, last_state, state):
         # check 1: if (last_state, lastQ, lastI, state) and (last_state, lastQ, lastI, state1), state should be equal to state1
+        if last_state == "<START>":
+            return state
         dict1 = self.__transitions.get(last_state, None)
         if dict1 == None:
             return state
         dict2 = dict1.get(lastQ, None)
         if dict2 == None:
             return state
-        state1 = dict2.get(lastI, "")
+        state1 = dict2.get(lastI.get_input(), "")
         if state1 != state:
             state = self.__updateStateByCallGPT(state, Ques, [*self.__stateToInfo], state1)
+        return state
 
     def __checkInputsToUpdateLastState(self, lastQ, last_state):
-        if self.__stateToInfoTemp.get(lastQ, None) != None:
+        if lastQ != last_state:
             # last_state_previous = last_state
             # # check 0: the transition (last_state, q, lasta, state2) is in the FSM, q != lastq, state2 != self.state, which means last_state is wrong
             # for Q, value in self.__transitions.get(last_state, {}).items():
@@ -152,16 +158,14 @@ class FSM():
             # if last_state == last_state_previous: # if last_state does not change after check 1
             
             # check 2: Ques2 and lastQ shares the last_state, but Ques2 and lastQ has different candidate input set
-            candidate_answer0 = set(lastQ.getInputs())
-            Ques2 = None
-            for Q in self.__transitions.get(last_state, {}).keys():
-                if Q != lastQ:
-                    candidate_answer1 = set(Q.getInputs())
+            candidate_answer0 = lastQ.get_inputSet()
+            for Ques2 in self.__QuesSet:
+                if Ques2.get_ques() == last_state:
+                    candidate_answer1 = Ques2.get_inputSet()
                     if len(candidate_answer0) != len(candidate_answer1) or candidate_answer0 & candidate_answer1 != candidate_answer0:
-                        Ques2 = Q
-                        break
-            if Ques2 != None:
-                last_state = self.__updateStateByCallGPT(last_state, lastQ, [*self.__stateToInfo])
+                        last_state = self.__updateStateByCallGPT(last_state, lastQ, [*self.__stateToInfo])    
+                    break
+                
 
     def __checkTheErrorStateToUpdateContextRelatedInput(self, lastQ, lastI, Ques, last_state, state, questions):
         if Ques.getState() == None:
@@ -180,7 +184,7 @@ class FSM():
                 if lastQ != None:
                     if self.__transitions[last_state].get(lastQ, None) == None:
                         self.__transitions[last_state][lastQ] = {}
-                    self.__transitions[last_state][lastQ][lastI] = state
+                    self.__transitions[last_state][lastQ][lastI.get_input()] = state
             else:
                 isErrorState = self.__isErrorState(questions)
                 depth = self.__stateToInfo[last_state][1] + 1
@@ -202,7 +206,7 @@ class FSM():
             if lastQ != None:
                 if self.__transitions[last_state].get(lastQ, None) == None:
                     self.__transitions[last_state][lastQ] = {}
-                self.__transitions[last_state][lastQ][lastI] = state
+                self.__transitions[last_state][lastQ][lastI.get_input()] = state
 
     def __updateStateByCallGPT(self, state, lastQ, state_list, state1=""):
         skill_output = lastQ.get_ques()
