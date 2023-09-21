@@ -6,6 +6,7 @@ class Question():
         self.__reward = 0
         self.__Inpt_list = []
         self.__gpt_times = 0
+        self.__state = None
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -34,6 +35,9 @@ class Question():
     def getInputs(self):
         return self.__Inpt_list
 
+    def getState(self):
+        return self.__state
+
     def addSysInputs(self, sysAns):
         for ans in sysAns:
             new_input = Input(0, ans)
@@ -57,6 +61,9 @@ class Question():
 
     def setType(self, type):
         self.__quesType = type
+
+    def setState(self, state):
+        self.__state = state
 
     def addReward(self, u):
         self.__reward = self.__reward + u
