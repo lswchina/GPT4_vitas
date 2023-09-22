@@ -90,7 +90,7 @@ if __name__ == '__main__':
         fsm = FSM(gpt)
         if skill.skillName == '<end_of_excel>':
             break
-        if index > 11:
+        if index > 20:
             break
         if skill.skillName != '':
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
