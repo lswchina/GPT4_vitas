@@ -31,41 +31,43 @@ class getAns:
         print("The question is ", Ques)
         #step 1
         current_state = self.FSM.updateFSM(lastQ, lastI, Ques, questions)
-        Ques_of_current_state = Ques
-        if current_state != Ques_of_current_state.get_ques():
+        if current_state != Ques.get_ques():
             Ques_of_current_state = self.FSM.has_ques(current_state)
+        else:
+            Ques_of_current_state = Ques
         candidate_Inpt_list = self.FSM.getInputsOfQues(Ques_of_current_state)
         
         #begin----: change lastQ's __new_state
         if lastQ != None:
-            last_state = lastQ.getState()
-            lastQ_of_last_state = lastQ
-            if last_state != lastQ_of_last_state:
-                lastQ_of_last_state = self.FSM.has_ques(last_state)
-            if len(candidate_Inpt_list) == 0:
-                lastQ_of_last_state.addNewState(lastI, 0.1)
-            else:
-                if last_state in questions:
-                    lastQ_of_last_state.addNewState(lastI, -0.3)
+            last_state = self.FSM.getStateOfQues(lastQ)
+            if last_state != None:
+                if len(candidate_Inpt_list) == 0: #current_state is new
+                    self.FSM.addNewStateToInptOfques(last_state, lastI, 0.1)
                 else:
-                    old_state_num = 0
-                    for ques in questions:
-                        Ques_temp = self.FSM.has_ques(ques)
-                        if Ques_temp == None or len(self.FSM.getInputsOfQues(Ques_temp)) == 0:
-                            old_state_num += 1
-                    if len(questions) <= 2 * old_state_num:
-                        lastQ_of_last_state.addNewState(lastI, -0.2)
-                    elif len(questions) <= 3 * old_state_num:
-                        lastQ_of_last_state.addNewState(lastI, -0.1)
+                    # current_state is equal to last_state
+                    if current_state in questions or Ques.get_ques() in questions:
+                        self.FSM.addNewStateToInptOfques(last_state, lastI, -0.3)
+                    else:
+                        old_state_num = 0
+                        for ques in questions:
+                            state_of_ques = self.FSM.getStateOfques(ques)
+                            if state_of_ques == None:
+                                continue
+                            if len(self.FSM.getInputsOfques(state_of_ques)) != 0:
+                                old_state_num += 1
+                        if len(questions) <= 2 * old_state_num:
+                            self.FSM.addNewStateToInptOfques(last_state, lastI, -0.2)
+                        elif len(questions) <= 3 * old_state_num:
+                            self.FSM.addNewStateToInptOfques(last_state, lastI, -0.1)
         #end----: change lastQ's __new_state
               
         if len(candidate_Inpt_list) == 0:
-            if Ques_of_current_state.get_ques() != ".":
+            if current_state != ".":
                 context_ans = self.getResponses(Ques_of_current_state, lastQ, lastI)
             else:
                 context_ans = []
             self.FSM.addInputs(Ques_of_current_state, self.sysAns, self.bascAnsToIW, self.helpAns, context_ans)
-            candidate_Inpt_list = self.FSM.getInputsOfQues(Ques_of_current_state)
+            candidate_Inpt_list = self.FSM.getInputsOfques(current_state)
         #state_info = self.FSM.getStateInfoOfState(current_state)
         #Done: maybe transitions does not need Ques?
         #Done: candidate_Inpt_list belongs to current_state, not Ques.get_ques()
@@ -173,7 +175,6 @@ class getAns:
             Ques = self.FSM.has_ques(question[-1])
             if Ques == None:
                 Ques = Question(question)
-                self.FSM.addQuesToQuesSet(Ques)
                 self.FSM.addInputs(Ques, self.sysAns, self.bascAnsToIW, [], [])
         return
 

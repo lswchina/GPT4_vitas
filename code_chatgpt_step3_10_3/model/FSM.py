@@ -17,17 +17,35 @@ class FSM():
         Ques.addContextInputs(contextAns)
         Ques.addHelpInputs(helpAns)
         Ques.addBascInputs(bascAnsToIW)
-        if Ques not in self.__QuesSet:
-            self.__QuesSet.add(Ques)
+        self.__QuesSet.add(Ques)
 
     def addTimes(self, Ques, Inpt):
-        Ques.addTimes(Inpt)
+        return self.addTimesOfques(Ques.get_ques(), Inpt)
+
+    def addTimesOfques(self, ques, Inpt):
+        Ques = self.has_ques(ques)
+        if Ques != None:
+            Ques.addTimes(Inpt)
+
+    def addNewStateToInptOfQues(self, Ques, Inpt, u):
+        return self.addNewStateToInptOfques(Ques.get_ques(), Inpt, u)
+
+    def addNewStateToInptOfques(self, ques, Inpt, u):
+        Ques = self.has_ques(ques)
+        if Ques != None:
+            Ques.addNewState(Inpt, u)
 
     def addQuesToQuesSet(self, Ques):
         self.__QuesSet.add(Ques)
 
     def getInputsOfQues(self, Ques):
-        return Ques.getInputs()
+        return self.getInputsOfques(Ques.get_ques())
+
+    def getInputsOfques(self, ques):
+        Ques_in_FSM = self.has_ques(ques)
+        if Ques_in_FSM != None:
+            return Ques_in_FSM.getInputs()
+        return []
 
     def getStateInfoOfState(self, state):
         if self.__stateToInfoTemp.get(state, None) != None:
@@ -36,6 +54,16 @@ class FSM():
             return states_
         else:
             return self.__stateToInfo
+    
+    def getStateOfQues(self, Ques):
+        return self.getStateOfques(Ques.get_ques())
+    
+    def getStateOfques(self, ques):
+        Ques = self.has_ques(ques)
+        if Ques == None:
+            return None
+        state_of_Ques = Ques.getState()
+        return state_of_Ques
 
     def getContextRelatedInputsOfQues(self, Ques):
         context_related_Inpts = []
