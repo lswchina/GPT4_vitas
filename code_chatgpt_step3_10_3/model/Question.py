@@ -46,12 +46,18 @@ class Question():
 
     def addSysInputs(self, sysAns):
         for ans in sysAns:
-            new_input = Input(0, ans)
+            new_input = Input(0, ans, 0.1)
             self.__Inpt_list.append(new_input)
+        
+    def addBascInputs(self, bascAnsToIW):
+        for ans in bascAnsToIW.keys():
+            new_input = Input(3, ans, bascAnsToIW[ans])
+            if ans not in self.__Inpt_list:
+                self.__Inpt_list.append(new_input)
 
     def addHelpInputs(self, helpAns):
         for ans in helpAns:
-            new_input = Input(1, ans)
+            new_input = Input(1, ans, 0.9)
             if new_input not in self.__Inpt_list:
                 self.__Inpt_list.append(new_input)
 
@@ -61,9 +67,14 @@ class Question():
             if not isinstance(ans, str):
                 continue
             ans0 = ans.lower()
-            new_input = Input(2, ans0)
+            new_input = Input(2, ans0, 1.0)
             if new_input not in self.__Inpt_list:
                 self.__Inpt_list.append(new_input)
+
+    def addNewState(self, Inpt, u):
+        for Inpt_ in self.__Inpt_list:
+            if Inpt_ == Inpt:
+                Inpt_.addNewState(u)
 
     def setType(self, type):
         self.__quesType = type
@@ -91,3 +102,13 @@ class Question():
             if Inpt.get_input() == inpt:
                 return Inpt
         return None
+
+    def select_Inpt(self):
+        highest_weight = 0
+        selectInpt = None
+        for Inpt in self.__Inpt_list:
+            weight = Inpt.get_weight()
+            if weight > highest_weight:
+                highest_weight = weight
+                selectInpt = Inpt
+        return selectInpt

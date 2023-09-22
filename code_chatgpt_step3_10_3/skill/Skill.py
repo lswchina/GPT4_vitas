@@ -234,6 +234,22 @@ class Skill:
             print("no subject?")
             sys.exit()
 
+    def __getInitWeight(self, userAct):
+        length = len(userAct)
+        impActWord = ['get', 'help', 'change', 'repeat', 'set', 'collect', 'play']#instruction verbs
+        weight = 0
+        nlp = spacy.load("en_core_web_md")
+        
+        verb = nlp(userAct[0].text)[0]
+        
+        for word in impActWord:
+            ImpW = nlp(word)[0]
+            if ImpW.similarity(verb) > weight:
+                weight = ImpW.similarity(verb)
+        if weight > 1.0:
+            weight = 1.0
+        return weight
+
     def __getInfoInQuotes(self):
         self.__infoInQuotes = []
         inInfo = False
@@ -260,7 +276,7 @@ class Skill:
 
     def getBascComds(self):
         if self.__basicComds == None:
-            self.__basicComds = []
+            self.__basicComds = {}
             self.__basicComds.extend(self.__infoInQuotes)
             bascComdContent = ""
             for i in range(len(self.__userActions)):
@@ -272,7 +288,8 @@ class Skill:
                     else:
                         bascComdContent = bascComdContent + " " + re.sub(r"[^\sa-zA-Z0-9_\.,'?!]", '', self.__userActions[i][j].text)
                 if bascComdContent != "":
-                    self.__basicComds.append(bascComdContent)
+                    bascComdRltWeight = self.__getInitWeight(self.userActions[i])
+                    self.__basicComds[bascComdContent] = bascComdRltWeight
         return self.__basicComds
               
     def getSysComds(self):

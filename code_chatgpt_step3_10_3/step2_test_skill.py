@@ -37,7 +37,7 @@ def ansAlexa(output, questions):
         question = questions[-1]
     Answers = output.getResponses(Question(question), None, None)
     for key in Answers:
-        return Input(-1, key)
+        return Input(-1, key, 0)
     print("Without answer?")
     return None
     
@@ -51,13 +51,13 @@ def ansSkill(index, output, fsm, rounds, request, lastQuestion, Inpt, time_befor
         output.addHelpAns(questions)
         Ques = output.selectQuestion(questions)
         fsm.updateFSM(lastQuestion, Inpt, Ques)
-        return [Input(0, 'help'), Ques]
+        return [Input(0, 'help', 0.1), Ques]
     if rounds == 1 and index == 0:
         return output.getHelpResponse(questions, lastQuestion)
     elif time.time() - time_before_testing >= Constant.TIME_LIMIT:
         Ques = output.selectQuestion(questions)
         fsm.updateFSM(lastQuestion, Inpt, Ques)
-        return [Input(0, 'stop'), Ques]
+        return [Input(0, 'stop', 0.1), Ques]
     else:
         return output.getResponse(questions, lastQuestion, Inpt)
 
@@ -77,7 +77,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
         questions = []
         lastRequest = []
         lastQuestion = None
-        Inpt = Input(-1, skill.invocation[0])
+        Inpt = Input(-1, skill.invocation[0], 0)
         rounds = 0
 
         request = UI.input_and_response(spider, Inpt, fileTest, False)
@@ -148,7 +148,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
             #detect problems
             result2 = pro_detc.isUnrespondingVUI(Inpt, lastRequest, request, spider, fileTest)     #problem 1: unexpected exit
             if result2[0]:
-                Inpt = Input(0, 'What\'s the time')
+                Inpt = Input(0, 'What\'s the time', 0.1)
                 if result2[1] == 1:
                     if Stop == False:
                         log += "problem1----------unexpected exit!\n"
@@ -210,7 +210,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
         if lastQuestion.get_ques() != "<END>":
             for sign in Constant.StopSign:
                 if sign in Inpt.get_input():
-                    newInpt = Input(0, "What\'s the time")
+                    newInpt = Input(0, "What\'s the time", 0.1)
                     Ques = fsm.has_ques("<END>")
                     if Ques == None:
                         Ques = Question("<END>")
@@ -237,10 +237,10 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
     # if endWithStop == False and time.time() - time_before_testing < Constant.TIME_LIMIT:
     #     fileTest = os.path.join(skill_log_path, skillName_to_dirName + "3.txt")
     #     log = ''
-    #     Inpt = Input(-1, skill.invocation[0])
+    #     Inpt = Input(-1, skill.invocation[0], 0)
     #     time_start = time.time()
     #     request = UI.input_and_response(spider, Inpt, fileTest, True)
-    #     Inpt = Input(0, 'stop')
+    #     Inpt = Input(0, 'stop', 0.1)
     #     request = UI.input_and_response(spider, Inpt, fileTest, True)
     #     if pro_detc.isUnstoppable(spider, Inpt, fileTest):   #problem 3: unstoppable skill
     #         log += "problem3----------unstoppable skill!\n"

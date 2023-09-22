@@ -65,6 +65,11 @@ def init_constant():
     Constant.SYSTEM_LEVEL_LABEL = "system-level"
     Constant.HELP_EMBEDDED_LABEL = "help-embedded"
     Constant.CONTEXT_RELATED_LABEL = "context-related"
+    Constant.DOCUMENT_RECHIEVED_LABEL = "document-rechieved"
+    Constant.M = 10
+    Constant.ALPHA = 0.6
+    Constant.BETA = 0.4
+    Constant.GAMMA = 1.0 / Constant.M
 
 if __name__ == '__main__':
     EXCEL_PATH, LOG_PATH, RESULT_PATH = getArgs()

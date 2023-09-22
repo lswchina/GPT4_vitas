@@ -1,3 +1,4 @@
+from multiprocessing.spawn import old_main_modules
 import np
 import time
 from util.NLP import NLP
@@ -9,9 +10,7 @@ class getAns:
         self.timeStart = time.time()
         self.skillName = skillName
         self.sysAns = sysComds
-        for ans in basicComds:
-            if ans not in self.sysAns:
-                self.sysAns.append(ans)
+        self.bascAnsToIW = basicComds
         self.helpAns = []
         self.gpt = gpt
         self.FSM = fsm
@@ -36,18 +35,42 @@ class getAns:
         if current_state != Ques_of_current_state.get_ques():
             Ques_of_current_state = self.FSM.has_ques(current_state)
         candidate_Inpt_list = self.FSM.getInputsOfQues(Ques_of_current_state)
+        
+        #begin----: change lastQ's __new_state
+        if lastQ != None:
+            last_state = lastQ.getState()
+            lastQ_of_last_state = lastQ
+            if last_state != lastQ_of_last_state:
+                lastQ_of_last_state = self.FSM.has_ques(last_state)
+            if len(candidate_Inpt_list) == 0:
+                lastQ_of_last_state.addNewState(lastI, 0.1)
+            else:
+                if last_state in questions:
+                    lastQ_of_last_state.addNewState(lastI, -0.3)
+                else:
+                    old_state_num = 0
+                    for ques in questions:
+                        Ques_temp = self.FSM.has_ques(ques)
+                        if Ques_temp == None or len(self.FSM.getInputsOfQues(Ques_temp)) == 0:
+                            old_state_num += 1
+                    if len(questions) <= 2 * old_state_num:
+                        lastQ_of_last_state.addNewState(lastI, -0.2)
+                    elif len(questions) <= 3 * old_state_num:
+                        lastQ_of_last_state.addNewState(lastI, -0.1)
+        #end----: change lastQ's __new_state
+              
         if len(candidate_Inpt_list) == 0:
             if Ques_of_current_state.get_ques() != ".":
                 context_ans = self.getResponses(Ques_of_current_state, lastQ, lastI)
             else:
                 context_ans = []
-            self.FSM.addInputs(Ques_of_current_state, self.sysAns, self.helpAns, context_ans)
+            self.FSM.addInputs(Ques_of_current_state, self.sysAns, self.bascAnsToIW, self.helpAns, context_ans)
             candidate_Inpt_list = self.FSM.getInputsOfQues(Ques_of_current_state)
-        state_info = self.FSM.getStateInfoOfState(current_state)
+        #state_info = self.FSM.getStateInfoOfState(current_state)
         #Done: maybe transitions does not need Ques?
         #Done: candidate_Inpt_list belongs to current_state, not Ques.get_ques()
-        ans = self.gpt.step3_chat(state_info, current_state, self.FSM.getTransitionOfState(current_state), candidate_Inpt_list)
-        Inpt = Ques_of_current_state.has_input(ans)
+        #ans = self.gpt.step3_chat(state_info, current_state, self.FSM.getTransitionOfState(current_state), candidate_Inpt_list)
+        Inpt = Ques_of_current_state.select_Inpt()
         self.FSM.addTimes(Ques_of_current_state, Inpt)
         print(candidate_Inpt_list)
         return [Inpt, Ques]
@@ -139,7 +162,7 @@ class getAns:
                 if Ques != None:
                     self.FSM.addQuesToQuesSet(Ques)
                     response_list = self.gpt.step2_chat(Ques)
-                    self.FSM.addInputs(Ques, self.sysAns, [], response_list)
+                    self.FSM.addInputs(Ques, self.sysAns, self.bascAnsToIW, [], response_list)
                     for ans in response_list:
                         if not isinstance(ans, str):
                             continue
@@ -151,12 +174,12 @@ class getAns:
             if Ques == None:
                 Ques = Question(question)
                 self.FSM.addQuesToQuesSet(Ques)
-                self.FSM.addInputs(Ques, self.sysAns, [], [])
+                self.FSM.addInputs(Ques, self.sysAns, self.bascAnsToIW, [], [])
         return
 
     def getHelpResponse(self, questions, lastQ):
         self.addHelpAns(questions)
-        return self.getResponse(questions, lastQ, Input(0,'help'))
+        return self.getResponse(questions, lastQ, Input(0,'help', 0.1))
     
 if __name__ == '__main__':
     NLP.getNoneOfIQ("Please say a valid stock ticker symbol or name .")
