@@ -278,10 +278,10 @@ class Skill:
         if self.__basicComds == None:
             self.__basicComds = {}
             self.__basicComds.extend(self.__infoInQuotes)
-            bascComdContent = ""
             for i in range(len(self.__userActions)):
                 if len(self.__userActions[i]) > 0 and self.__userActions[i][0].lemma_ == "be" or len(self.__userActions[i]) == 0:
                     continue
+                bascComdContent = ""
                 for j in range(len(self.__userActions[i])):
                     if bascComdContent == "":
                         bascComdContent = re.sub(r"[^\sa-zA-Z0-9_\.,'?!]", '', self.__userActions[i][j].text)
