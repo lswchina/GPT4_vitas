@@ -22,6 +22,8 @@ class Input():
             type_name = Constant.HELP_EMBEDDED_LABEL
         elif self.__type == 2:
             type_name = Constant.CONTEXT_RELATED_LABEL
+        else:
+            type_name = "not-a-skill-answer"            
         return "{0}:[{1}, {2}]".format(self.__input, type_name, self.__times)
     
     def __repr__(self):
@@ -32,6 +34,8 @@ class Input():
             type_name = Constant.HELP_EMBEDDED_LABEL
         elif self.__type == 2:
             type_name = Constant.CONTEXT_RELATED_LABEL
+        else:
+            type_name = "not-a-skill-answer"
         return '"{0}":["{1}", {2}]'.format(self.__input, type_name, self.__times)
     
     def get_input(self):
