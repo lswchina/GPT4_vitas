@@ -17,7 +17,7 @@ def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark2022.xlsx")
     parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gpt4_vitas/")
-    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "./../output/gpt4_vitas/result/")
+    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/gpt4_vitas/result/")
     args = parser.parse_args()
     EXCEL_PATH = "../dataset_2022/" + args.excel_name
     LOG_PATH = args.log_path
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     init_dir(LOG_PATH, RESULT_PATH)
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
-    index = 1
+    index = 6
     not_list = [1,5]
     # for index in index_list:
     while True:
