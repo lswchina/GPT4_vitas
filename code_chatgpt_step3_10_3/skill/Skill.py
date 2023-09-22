@@ -290,6 +290,7 @@ class Skill:
                 if bascComdContent != "":
                     bascComdRltWeight = self.__getInitWeight(self.userActions[i])
                     self.__basicComds[bascComdContent] = bascComdRltWeight
+        print("basic command dict is ", self.__basicComds)
         return self.__basicComds
               
     def getSysComds(self):

@@ -273,6 +273,7 @@ class Skill:
                         bascComdContent = bascComdContent + " " + re.sub(r"[^\sa-zA-Z0-9_\.,'?!]", '', self.__userActions[i][j].text)
                 if bascComdContent != "":
                     self.__basicComds.append(bascComdContent)
+        print("basic command is ", self.__basicComds)
         return self.__basicComds
               
     def getSysComds(self):
