@@ -6,22 +6,60 @@ os.environ["http_proxy"] = "http://127.0.0.1:7890"
 os.environ["https_proxy"] = "http://127.0.0.1:7890"
 
 class askChatGPT:
-    def __init__(self, skillName, log_dir, __useAPI):
+    def __init__(self, skillName, log_dir, log_dir_gpt, __useAPI):
         self.skillName = skillName
         if log_dir != "":
             self.__Step1_Recorder_Path = os.path.join(log_dir, "step1_findState.txt")
             self.__Step2_Recorder_Path = os.path.join(log_dir, "step2_genInputs.txt")
-            self.__Step3_Recorder_Path = os.path.join(log_dir, "step3_selectInput.txt")
         else:
             self.__Step1_Recorder_Path = ''
             self.__Step2_Recorder_Path = ''
-            self.__Step3_Recorder_Path = ''
+        self.__answerDict1 = {}
+        self.__answerDict2 = {}
+        if log_dir_gpt != "":
+            Step1_Recorder_Path_gpt = os.path.join(log_dir_gpt, "step1_findState.txt")
+            Step2_Recorder_Path_gpt = os.path.join(log_dir_gpt, "step2_genInputs.txt")
+            self.__answerDict1 = self.__getAnswerDict(1, Step1_Recorder_Path_gpt)
+            self.__answerDict2 = self.__getAnswerDict(2, Step2_Recorder_Path_gpt)
         self.__useAPI = __useAPI
         self.__promptGlobal1 = ""
         self.__promptGlobal2 = ""
-        self.__promptGlobal3 = ""
+
+    def __getAnswerDict(self, type, log_path):
+        answerDict = {}
+        if type == 1:
+            line = 16
+        elif type == 2:
+            line = 28
+        if not os.path.exists(log_path):
+            return answerDict
+        gptResponse = False
+        input_ = ""
+        output_ = ""
+        with open(log_path, "r", encoding="utf-8") as f:
+            for num, l in enumerate(f):
+                if num < line - 1:
+                    continue
+                if l.startswith("Input: "):
+                    input_ = l.strip("\n")[7:]
+                elif l.startswith("GPT4:") and input_ != "":
+                    gptResponse = True
+                elif gptResponse == True:
+                    output_ = l.strip("\n")
+                    answerDict[input_] = [output_]
+                    input_ = ""
+                    gptResponse = False
+        return answerDict
 
     def step1_chat(self, skill_output, state_list):
+        input_ = 'sentence: "' + skill_output + '", state list: ' + str(state_list)
+        state = self.__answerDict1.get(input_, None)
+        if state != None:
+            state = state.strip('"')
+            if state not in state_list and state != skill_output:
+                return skill_output
+            return state
+
         openai.api_key = os.getenv("OPENAI_API_KEY")
         messageBody = [
             {"role": "system", "content": "Help the user find a semantically identical state in the FSM."}
@@ -30,7 +68,7 @@ class askChatGPT:
         if self.__promptGlobal1 == "":
             hasGlobal1 = False
             self.getPromptGlobal1()
-        promptBody = 'Input: sentence: "' + skill_output + '", state list: ' + str(state_list) + '\n'
+        promptBody = 'Input: ' + input_ + '\n'
         promptBody = promptBody + "Output:"
         if hasGlobal1 == False:
             self.__record_result(self.__Step1_Recorder_Path, "User:\n" + self.__promptGlobal1 + promptBody + "\n")
@@ -122,6 +160,23 @@ class askChatGPT:
         return state2
 
     def step2_chat(self, Ques):
+        skill_output = Ques.get_ques()
+        input_ = 'skill: "' + skill_output + '"'
+        gpt_response = self.__answerDict2.get(input_, None)
+        if gpt_response != None:
+            index1 = gpt_response.find("[")
+            index2 = gpt_response.rfind("]")
+            if index1 != -1 and index2 != -1:
+                gpt_response = gpt_response[index1: index2 + 1]
+                response_list = list(eval(gpt_response))
+                if len(response_list) == 1 and response_list[0] == "":
+                    response_list = []
+            else:
+                response_list = []
+            if len(response_list) > 3 and (Ques.get_quesType() == 3 or Ques.get_quesType() == -1):
+                response_list = self.__remove_low_certain(response_list)
+            return response_list
+
         openai.api_key = os.getenv("OPENAI_API_KEY")
         messageBody = [
             {"role": "system", "content": "Find all the responses to the skill's sentence."}
@@ -130,8 +185,7 @@ class askChatGPT:
         if self.__promptGlobal2 == "":
             hasGlobal2 = False
             self.__getPromptGlobal2()
-        skill_output = Ques.get_ques()
-        promptBody = 'Input: skill: "' + skill_output + '"\n'
+        promptBody = 'Input: ' + input_ + '\n'
         promptBody = promptBody + "Output:"
         if hasGlobal2 == False:
             self.__record_result(self.__Step2_Recorder_Path, "User:\n" + self.__promptGlobal2 + promptBody + "\n")
