@@ -9,6 +9,9 @@ class getAns:
         self.timeStart = time.time()
         self.skillName = skillName
         self.sysAns = sysComds
+        for ans in basicComds:
+            if ans not in self.sysAns:
+                self.sysAns.append(ans)
         self.helpAns = []
         self.gpt = gpt
         self.FSM = fsm
