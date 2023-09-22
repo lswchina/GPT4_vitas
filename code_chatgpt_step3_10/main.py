@@ -75,7 +75,7 @@ if __name__ == '__main__':
     init_dir(LOG_PATH, RESULT_PATH)
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
-    index = 6
+    index = 17
     not_list = [1,5]
     # for index in index_list:
     while True:
