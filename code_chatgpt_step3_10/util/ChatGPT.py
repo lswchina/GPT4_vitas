@@ -87,12 +87,12 @@ class askChatGPT:
 
     def step1_prompt2(self, state, skill_output, state_list, errorMessage, messageBody):
         if errorMessage == 'not_exist':
-            promptBody2 = "The \"" + state + "\" is not in the state list " + str(state_list) + ". "    
+            promptBody2 = "The \"" + state + "\" is not in the state list " + str(state_list) + ". "
+            promptBody2 = promptBody2 + "Find a semantically identical state from the state list " + str(state_list) + " for the response \"" + skill_output + "\"."
         elif errorMessage == 'wrong':
             promptBody2 = "The state \"" + state + "\" and sentence " + skill_output + " are not semantically identical."
         else:
             promptBody2 = "The state \"" + errorMessage + "\" and sentence " + skill_output + " are semantically idential."
-        promptBody2 = promptBody2 + "Find a semantically identical state from the state list " + str(state_list) + " for the response \"" + skill_output + "\"."
         self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
             messageBody.append({"role": "user", "content": promptBody2})

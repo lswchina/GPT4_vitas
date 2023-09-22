@@ -29,18 +29,23 @@ class getAns:
         print("The question is ", Ques)
         #step 1
         current_state = self.FSM.updateFSM(lastQ, lastI, Ques, questions)
-        candidate_Inpt_list = self.FSM.getInputsOfQues(Ques)
+        Ques_of_current_state = Ques
+        if current_state != Ques_of_current_state.get_ques():
+            Ques_of_current_state = self.FSM.has_ques(current_state)
+        candidate_Inpt_list = self.FSM.getInputsOfQues(Ques_of_current_state)
         if len(candidate_Inpt_list) == 0:
-            if Ques.get_ques() != ".":
-                context_ans = self.getResponses(Ques, lastQ, lastI)
+            if Ques_of_current_state.get_ques() != ".":
+                context_ans = self.getResponses(Ques_of_current_state, lastQ, lastI)
             else:
                 context_ans = []
-            self.FSM.addInputs(Ques, self.sysAns, self.helpAns, context_ans)
-            candidate_Inpt_list = self.FSM.getInputsOfQues(Ques)
-        state_info = self.FSM.getStateInfoOfQues(Ques, current_state)
-        ans = self.gpt.step3_chat(state_info, current_state, self.FSM.getTransitionOfQues(current_state, Ques), candidate_Inpt_list)
-        Inpt = Ques.has_input(ans)
-        self.FSM.addTimes(Ques, Inpt)
+            self.FSM.addInputs(Ques_of_current_state, self.sysAns, self.helpAns, context_ans)
+            candidate_Inpt_list = self.FSM.getInputsOfQues(Ques_of_current_state)
+        state_info = self.FSM.getStateInfoOfState(current_state)
+        #Done: maybe transitions does not need Ques?
+        #Done: candidate_Inpt_list belongs to current_state, not Ques.get_ques()
+        ans = self.gpt.step3_chat(state_info, current_state, self.FSM.getTransitionOfState(current_state), candidate_Inpt_list)
+        Inpt = Ques_of_current_state.has_input(ans)
+        self.FSM.addTimes(Ques_of_current_state, Inpt)
         print(candidate_Inpt_list)
         return [Inpt, Ques]
 

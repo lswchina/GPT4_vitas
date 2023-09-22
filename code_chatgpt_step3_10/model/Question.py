@@ -76,7 +76,7 @@ class Question():
 
     def addTimes(self, Inpt):
         for i, Input_ in enumerate(self.__Inpt_list):
-            if Input_ == Inpt:
+            if Input_.get_input() == Inpt.get_input():
                 self.__Inpt_list[i].addTimes()
                 break
     
