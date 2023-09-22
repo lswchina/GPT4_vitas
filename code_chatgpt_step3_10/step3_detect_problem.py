@@ -109,13 +109,13 @@ def unexpectedSkills(request, skillname, support_region):
         if req[1] == 'Alexa':
             questions = NLP.splitSentence(req[0])
             for ques in questions:
-                if 'Here \'s' in ques or 'Did you mean' in ques or 'Do you mean' in ques:
+                if 'Here\'s' in ques or 'Did you mean' in ques or 'Do you mean' in ques:
                     openSkillSentence = ques
                     break
     isSkillStart = True
-    skillNa = re.findall(r'Here \'s the skill (.*?)$', openSkillSentence)
+    skillNa = re.findall(r'Here\'s the skill (.*?)$', openSkillSentence)
     if len(skillNa) == 0:
-        skillNa = re.findall(r'Here \'s (.*?)$', openSkillSentence)
+        skillNa = re.findall(r'Here\'s (.*?)$', openSkillSentence)
     if len(skillNa) == 0:
         skillNa = re.findall(r'Did you mean (.*?)$', openSkillSentence)
         isSkillStart = False

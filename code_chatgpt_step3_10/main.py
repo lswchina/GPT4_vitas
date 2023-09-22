@@ -75,10 +75,13 @@ if __name__ == '__main__':
     init_dir(LOG_PATH, RESULT_PATH)
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
-    index = 11
-    # index_list = [11, 31, 34, 41]
+    index = 1
+    not_list = [1,5]
     # for index in index_list:
     while True:
+        if index in not_list:
+            index = index + 1
+            continue
         skill = Skill(EXCEL_PATH, index)
         skill_log_path = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.skillName))
         if not os.path.exists(skill_log_path):
