@@ -39,7 +39,7 @@ def ansAlexa(output, questions):
     for key in Answers:
         return Input(-1, key)
     print("Without answer?")
-    return None
+    return Input(-1, "")
     
 def ansSkill(index, output, fsm, rounds, request, lastQuestion, Inpt, time_before_testing):
     questions = []
@@ -119,7 +119,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
                     questions = NLP.splitSentence(req[0])
                     break
             Inpt = ansAlexa(output, questions)
-            if Inpt == None:
+            if Inpt.get_input() == "":
                 Stop = True
                 break
             print(Inpt)
