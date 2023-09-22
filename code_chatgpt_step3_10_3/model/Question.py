@@ -47,7 +47,8 @@ class Question():
     def addSysInputs(self, sysAns):
         for ans in sysAns:
             new_input = Input(0, ans, 0.1)
-            self.__Inpt_list.append(new_input)
+            if new_input not in self.__Inpt_list:
+                self.__Inpt_list.append(new_input)
         
     def addBascInputs(self, bascAnsToIW):
         for ans in bascAnsToIW.keys():
