@@ -13,9 +13,9 @@ class FSM():
         self.__gpt = gpt
 
     def addInputs(self, Ques, sysAns, helpAns, contextAns):
-        Ques.addSysInputs(sysAns)
         Ques.addContextInputs(contextAns)
         Ques.addHelpInputs(helpAns)
+        Ques.addSysInputs(sysAns)
         if Ques not in self.__QuesSet:
             self.__QuesSet.add(Ques)
 
