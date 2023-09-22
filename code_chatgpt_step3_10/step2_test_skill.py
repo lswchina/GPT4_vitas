@@ -24,12 +24,6 @@ def invalidRequest(request):
         return True
     return False
 
-def isSkillStart(request):
-    for req in request:
-        if req[1] != "Alexa":
-            return True
-    return False
-
 def ansAlexa(output, questions):
     if len(questions) == 0:
         question = '.'
@@ -60,6 +54,18 @@ def ansSkill(index, output, fsm, rounds, request, lastQuestion, Inpt, time_befor
         return [Input(0, 'stop'), Ques]
     else:
         return output.getResponse(questions, lastQuestion, Inpt)
+    
+def isSkillStart(request):
+    for req in request:
+        if req[1] != "Alexa":
+            return True
+    return False
+
+def getAlexa(request):
+    for req in request:
+        if req[1] == 'Alexa':
+            return req[0]
+    return None
 
 def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
     skillName_to_dirName = re.sub(r'(\W+)', '_', skill.skillName)
@@ -73,7 +79,6 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
         log = ''
         Stop = False
         skillStart = False
-        crash = False
         questions = []
         lastRequest = []
         lastQuestion = None
@@ -81,13 +86,10 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
         rounds = 0
 
         request = UI.input_and_response(spider, Inpt, fileTest, False)
-        if invalidRequest(request) == True:
-            i = 0
-            continue
-        if len(request) == 0:
+        if invalidRequest(request) or len(request) == 0:
             continue
 
-        while Stop == False and request[0][1] == 'Alexa' and skillStart == False:
+        while Stop == False and getAlexa(request) is not None and skillStart == False:
             print(request)
             result = pro_detc.unexpectedSkills(request, skill.skillName, skill.supportRegion) #problem 4: unexpected skills started
             if result[0] == True:
@@ -114,10 +116,9 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
                         addProblem(os.path.join(res_dir, "problem2.txt"), skill.skillName + ": " + result[1] + "(" + permission_str + ")")
                 break
             #answer alexa
-            for req in request:
-                if req[1] == 'Alexa':
-                    questions = NLP.splitSentence(req[0])
-                    break
+            alexa_response = getAlexa(request)
+            if alexa_response is not None:
+                questions = NLP.splitSentence(alexa_response)
             Inpt = ansAlexa(output, questions)
             if Inpt.get_input() == "":
                 Stop = True
@@ -130,7 +131,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
                 break
 
         rounds = 0
-        while Stop == False and crash == False:
+        while Stop == False:
             skillStart = True
             Inpt, lastQuestion = ansSkill(i, output, fsm, rounds, request, lastQuestion, Inpt, time_before_testing)
             print(Inpt)
@@ -146,20 +147,38 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
             print(request)
 
             #detect problems
-            result2 = pro_detc.isUnrespondingVUI(Inpt, lastRequest, request, spider, fileTest)     #problem 1: unexpected exit
-            if result2[0]:
-                Inpt = Input(0, 'What\'s the time')
-                if result2[1] == 1:
+            p1, type = pro_detc.isUnrespondingVUI(Inpt, lastRequest, request, spider, fileTest)     #problem 1: unexpected exit
+            if p1:
+                # Inpt = Input(0, 'What\'s the time')
+                if type == 1:
                     if Stop == False:
                         log += "problem1----------unexpected exit!\n"
                         addProblem(os.path.join(res_dir, "problem1.txt"), skill.skillName)
-                elif result2[1] == 2:
+                elif type == 2:
                     if Stop == False:
                         log += "problem1----------unexpected exit!\n"
                         addProblem(os.path.join(res_dir, "problem1.txt"), skill.skillName)
                     else:
                         log += "problem3----------unstoppable skill!\n"
                         addProblem(os.path.join(res_dir, "problem3.txt"), skill.skillName)
+            elif pro_detc.isCrash(lastRequest, request):      #problem 1: unexpected exit
+                log += "problem1----------unexpected exit!\n"
+                addProblem(os.path.join(res_dir, "problem1.txt"), skill.skillName)
+                p1 = True
+            else:
+                p2, privacy = pro_detc.privacyLeakage(request, gpt)            #problem 2: privacy violation
+                if p2:
+                    log += "problem2----------privacy violation!\n"
+                    if len(skill.permission_list) == 0:
+                        addProblem(os.path.join(res_dir, "problem2.txt"), skill.skillName + ": " + privacy)
+                    else:
+                        permission_str = ','.join(skill.permission_list)
+                        addProblem(os.path.join(res_dir, "problem2.txt"), skill.skillName + ": " + privacy + "(" + permission_str + ")")
+                rounds = rounds + 1
+            
+            #check is stopped
+            alexa_response = getAlexa(request)
+            if p1 or alexa_response is not None or Stop:
                 Ques = fsm.has_ques("<END>")
                 if Ques == None:
                     Ques = Question("<END>")
@@ -167,38 +186,6 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
                 fsm.updateFSM(lastQuestion, Inpt, Ques)
                 lastQuestion = Ques
                 break
-            if pro_detc.isCrash(lastRequest, request):      #problem 1: unexpected exit
-                log += "problem1----------unexpected exit!\n"
-                addProblem(os.path.join(res_dir, "problem1.txt"), skill.skillName)
-                crash = True
-            result = pro_detc.privacyLeakage(request, gpt)            #problem 2: privacy violation
-            if result[0]:
-                log += "problem2----------privacy violation!\n"
-                if len(skill.permission_list) == 0:
-                    addProblem(os.path.join(res_dir, "problem2.txt"), skill.skillName + ": " + result[1])
-                else:
-                    permission_str = ','.join(skill.permission_list)
-                    addProblem(os.path.join(res_dir, "problem2.txt"), skill.skillName + ": " + result[1] + "(" + permission_str + ")")
-            rounds = rounds + 1
-            isFSMUpdated = False
-            for req in request:
-                if req[1] == 'Alexa':
-                    Stop = True
-                    Ques = fsm.has_ques("<END>")
-                    if Ques == None:
-                        Ques = Question("<END>")
-                        fsm.addQuesToQuesSet(Ques)
-                    fsm.updateFSM(lastQuestion, Inpt, Ques)
-                    lastQuestion = Ques
-                    isFSMUpdated = True
-                    break
-            if Inpt in Constant.StopSign and isFSMUpdated == False and len(request) > 0:
-                Ques = fsm.has_ques("<END>")
-                if Ques == None:
-                    Ques = Question("<END>")
-                    fsm.addQuesToQuesSet(Ques)
-                fsm.updateFSM(lastQuestion, Inpt, Ques)
-                lastQuestion = Ques
 
         
         if invalidRequest(request) == True:
