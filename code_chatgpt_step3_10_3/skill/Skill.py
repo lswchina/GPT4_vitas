@@ -289,7 +289,7 @@ class Skill:
                     else:
                         bascComdContent = bascComdContent + " " + re.sub(r"[^\sa-zA-Z0-9_\.,'?!]", '', self.__userActions[i][j].text)
                 if bascComdContent != "":
-                    bascComdRltWeight = self.__getInitWeight(self.userActions[i])
+                    bascComdRltWeight = self.__getInitWeight(self.__userActions[i])
                     self.__basicComds[bascComdContent] = bascComdRltWeight
         print("basic command dict is ", self.__basicComds)
         return self.__basicComds
