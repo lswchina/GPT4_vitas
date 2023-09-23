@@ -78,7 +78,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
         questions = []
         lastRequest = []
         lastQuestion = None
-        Inpt = Input(-1, skill.invocation[0])
+        Inpt = Input(-1, skill.invocation[0], 0)
         rounds = 0
 
         request = UI.input_and_response(spider, Inpt, fileTest, False)
