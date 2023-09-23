@@ -16,9 +16,9 @@ os.environ["https_proxy"] = "http://127.0.0.1:7890"
 def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark2022.xlsx")
-    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gpt4_vitas/")
+    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gpt4_vitas_1/")
+    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/gpt4_vitas_1/result/")
     parser.add_argument("-g", help = "input the path to save logs of GPT4_vitas", dest = "log_path_gpt", type = str, default = "../../output/gpt4_vitas/")
-    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/gpt4_vitas/result/")
     args = parser.parse_args()
     EXCEL_PATH = "../dataset_2022/" + args.excel_name
     LOG_PATH = args.log_path
@@ -79,14 +79,14 @@ if __name__ == '__main__':
     init_dir(LOG_PATH, RESULT_PATH)
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
-    index = 9
+    index = 4
     not_list = [1,5]
     # for index in index_list:
     while True:
         if index in not_list:
             index = index + 1
             continue
-        if index > 9:
+        if index > 20:
             break
         skill = Skill(EXCEL_PATH, index)
         if skill.skillName == '<end_of_excel>':
