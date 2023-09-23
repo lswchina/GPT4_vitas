@@ -31,10 +31,9 @@ class getAns:
         print("The question is ", Ques)
         #step 1
         current_state = self.FSM.updateFSM(lastQ, lastI, Ques, questions)
-        if current_state != Ques.get_ques():
+        Ques_of_current_state = Ques
+        if current_state != Ques_of_current_state.get_ques():
             Ques_of_current_state = self.FSM.has_ques(current_state)
-        else:
-            Ques_of_current_state = Ques
         candidate_Inpt_list = self.FSM.getInputsOfQues(Ques_of_current_state)
         
         #begin----: change lastQ's __new_state

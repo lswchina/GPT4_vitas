@@ -463,9 +463,9 @@ class askChatGPT:
             for word in inQuoteWords:
                 if input_ == word.lower():
                     return input_
-        for i in candidate_input_list:
-            if i in response2:
-                return i
+        for input_ in candidate_input_list:
+            if input_ in response2:
+                return input_
         ind = random.randint(0, len(candidate_input_list) - 1)
         return candidate_input_list[ind]
 

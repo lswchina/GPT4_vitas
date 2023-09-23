@@ -40,7 +40,7 @@ class getAns:
             Ques_of_current_state = self.FSM.has_ques(current_state)
         candidate_Inpt_list = self.FSM.getInputsOfQues(Ques_of_current_state)
         if len(candidate_Inpt_list) == 0:
-            if Ques_of_current_state.get_ques() != ".":
+            if current_state != ".":
                 context_ans = self.getResponses(Ques_of_current_state, lastQ, lastI)
             else:
                 context_ans = []
