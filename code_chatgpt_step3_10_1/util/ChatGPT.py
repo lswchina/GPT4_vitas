@@ -47,10 +47,19 @@ class askChatGPT:
                 elif l.startswith("GPT4:") and input_ != "":
                     gptResponse = True
                 elif gptResponse == True:
-                    output_ = l.strip("\n")
-                    answerDict[input_] = output_
-                    input_ = ""
-                    gptResponse = False
+                    if type == 3:
+                        if output_.startswith("Output: "):
+                            output_ = output_ + l.strip("\n")
+                            answerDict[input_] = output_
+                            input_ = ""
+                            gptResponse = False
+                        else:
+                            output_ = l
+                    if type == 2:
+                        output_ = l.strip("\n")
+                        answerDict[input_] = output_
+                        input_ = ""
+                        gptResponse = False 
         return answerDict
 
     def step2_chat(self, Ques):
