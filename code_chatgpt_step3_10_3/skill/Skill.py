@@ -277,7 +277,8 @@ class Skill:
     def getBascComds(self):
         if self.__basicComds == None:
             self.__basicComds = {}
-            self.__basicComds.extend(self.__infoInQuotes)
+            for cmd in self.__infoInQuotes:
+                self.__basicComds[cmd] = 0.8
             for i in range(len(self.__userActions)):
                 if len(self.__userActions[i]) > 0 and self.__userActions[i][0].lemma_ == "be" or len(self.__userActions[i]) == 0:
                     continue
