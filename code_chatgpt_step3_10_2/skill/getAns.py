@@ -21,12 +21,15 @@ class getAns:
 
     def getResponses(self, Ques, lastQ, lastI):
         spacyRet = NLP.imergeNones(Ques.get_ques())
-        requireContext = False
-        if NLP.isSQAns(spacyRet) or NLP.isYNAns(spacyRet):
-            requireContext = False
-        else:
-            requireContext = True
-        response_list = self.gpt.step2_chat(Ques)
+        ques_type = Ques.get_quesType()
+        response_list = []
+        if ques_type != -1:
+            response_list.extend(NLP.getYNAns(spacyRet))
+            response_list.extend(NLP.getIQAns(spacyRet))
+            response_list.extend(NLP.getSQAns(spacyRet))
+            if ques_type == 3:
+                whAns, response_list = NLP.getWhQAns(Ques, response_list)
+                response_list.extend(whAns)
         return response_list
 
     def getResponse(self, questions, lastQ, lastI, next_input = ''):
@@ -73,16 +76,18 @@ class getAns:
             else:
                 Ques = Question(question)
                 question_type = -1
-                if NLP.isWhQ(question) == False:
+                whAns = NLP.isWhQ(question)
+                if whAns == None:
                     spacyRet = NLP.imergeNones(question)
                     if NLP.isYNAns(spacyRet):
                         question_type = 0
                     elif NLP.isIQAns(spacyRet):
                         question_type = 1
-                    elif NLP.isIQAns(spacyRet):
+                    elif NLP.isSQAns(spacyRet):
                         question_type = 2
                 else:
                     question_type = 3
+                    Ques.setWhAns(whAns)
                 if question_type != -1:
                     Ques.setType(question_type)
                 self.FSM.addQuesToQuesSet(Ques)
@@ -144,7 +149,9 @@ class getAns:
                     Ques.setType(2)
                 if Ques != None:
                     self.FSM.addQuesToQuesSet(Ques)
-                    response_list = self.gpt.step2_chat(Ques)
+                    response_list = []
+                    response_list.extend(NLP.getIQAns(spacyRet))
+                    response_list.extend(NLP.getSQAns(spacyRet))
                     self.FSM.addInputs(Ques, self.sysAns, [], response_list)
                     for ans in response_list:
                         if not isinstance(ans, str):

@@ -191,37 +191,22 @@ class FSM():
                 depth = self.__stateToInfo[last_state][1] + 1
                 self.__stateToInfo[state] = [isErrorState, depth]
                 Ques.setState(state)
-                if lastQ != None and lastI in self.getContextRelatedInputsOfQues(lastQ) and (isErrorState or Ques == lastQ):
-                    self.__updateContextRelatedInputByCallGPT(lastQ, lastI, last_state)
                 if self.__transitions.get(last_state, None) == None:
                     self.__transitions[last_state] = {}
-                # if lastQ != None:
-                #     if self.__transitions[last_state].get(lastQ, None) == None:
-                #         self.__transitions[last_state][lastQ] = {}
-                #     self.__transitions[last_state][lastQ][lastI.get_input()] = state
                 self.__transitions[last_state][lastI.get_input()] = state
             else:
                 isErrorState = self.__isErrorState(questions)
                 depth = self.__stateToInfo[last_state][1] + 1
                 self.__stateToInfoTemp[state] = [isErrorState, depth]
                 Ques.setState(state)
-                if lastQ != None and lastI in self.getContextRelatedInputsOfQues(lastQ) and (isErrorState or Ques == lastQ):
-                    self.__updateContextRelatedInputByCallGPT(lastQ, lastI, last_state)
                 self.__find_last_state[Ques] = last_state
-                self.__find_last_Inpt[Ques] = lastI
-                # self.__find_lastQ[Ques] = lastQ #not add to self.transitions here, later...
+                self.__find_last_Inpt[Ques] = lastI #not add to self.transitions here, later...
         else:
             depth = self.__stateToInfo[state][1]
             if self.__stateToInfo[last_state][1] + 1 < depth:
                 self.__stateToInfo[state][1] = self.__stateToInfo[last_state][1] + 1
-            if lastQ != None and lastI in self.getContextRelatedInputsOfQues(lastQ) and Ques == lastQ:
-                self.__updateContextRelatedInputByCallGPT(lastQ, lastI, last_state)
             if self.__transitions.get(last_state, None) == None:
                 self.__transitions[last_state] = {}
-            # if lastQ != None:
-            #     if self.__transitions[last_state].get(lastQ, None) == None:
-            #         self.__transitions[last_state][lastQ] = {}
-            #     self.__transitions[last_state][lastQ][lastI.get_input()] = state
             self.__transitions[last_state][lastI.get_input()] = state
 
     def __updateStateByCallGPT(self, state, lastQ, state_list, state1=""):
@@ -238,33 +223,3 @@ class FSM():
         else:
             state = self.__gpt.step1_prompt2(state, skill_output, state_list, state1, messageBody)
         return state
-
-    def __updateContextRelatedInputByCallGPT(self, lastQ, lastI, last_state):
-        context_related_inputs = self.getContextRelatedinputsOfQues(lastQ)
-        if lastQ.isOutOfGPTTimes() == True:
-            context_related_inputs_after = []
-        else:
-            type_ = lastQ.get_quesType()
-            last_ques = lastQ.get_ques()
-            nouns = []
-            if type_ == 3:
-                type_ == -1
-                beginWord = ''
-                clauses = last_ques.split(",")
-                for clause in clauses:
-                    beginWord = clause.split(" ")[0]
-                    if beginWord == "what" or beginWord == "What":
-                        type_ = 3
-                        nouns = NLP.getNoneOfWhatQ(last_ques)
-                        break
-            if type_ == 1:
-                nouns = NLP.getNoneOfIQ(last_ques)
-            context_related_inputs_after = self.__gpt.step2_prompt2(lastI.get_input(), lastQ, context_related_inputs, type_, last_state, nouns)
-        context_related_inputs_delete = set(context_related_inputs).difference(set(context_related_inputs_after))
-        transition_of_last_state = self.__transitions.get(last_state, None)
-        if transition_of_last_state != None:
-            for inpt_del in context_related_inputs_delete:
-                transition_of_last_state.pop(inpt_del, None)
-            self.__transitions[last_state] = transition_of_last_state
-        lastQ.addContextInputs(context_related_inputs_after)
-        lastQ.addGPTTimes()

@@ -16,8 +16,9 @@ os.environ["https_proxy"] = "http://127.0.0.1:7890"
 def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark2022.xlsx")
-    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gpt4_vitas/")
-    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/gpt4_vitas/result/")
+    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gpt4_vitas_2/")
+    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/gpt4_vitas_2/result/")
+    parser.add_argument("-g", help = "input the path to save logs of GPT4_vitas", dest = "log_path_gpt", type = str, default = "../../output/gpt4_vitas/")
     args = parser.parse_args()
     EXCEL_PATH = "../dataset_2022/" + args.excel_name
     LOG_PATH = args.log_path
@@ -26,7 +27,10 @@ def getArgs():
     RESULT_PATH = args.res_path
     if RESULT_PATH[-1] != '/':
         RESULT_PATH = RESULT_PATH + '/'
-    return EXCEL_PATH, LOG_PATH, RESULT_PATH
+    LOG_PATH_GPT = args.log_path_gpt
+    if LOG_PATH_GPT[-1] != '/':
+        LOG_PATH_GPT = LOG_PATH_GPT + '/'
+    return EXCEL_PATH, LOG_PATH, RESULT_PATH, LOG_PATH_GPT
 
 def init_dir(LOG_PATH, RESULT_PATH):
     if not os.path.exists(RESULT_PATH):
@@ -67,7 +71,7 @@ def init_constant():
     Constant.CONTEXT_RELATED_LABEL = "context-related"
 
 if __name__ == '__main__':
-    EXCEL_PATH, LOG_PATH, RESULT_PATH = getArgs()
+    EXCEL_PATH, LOG_PATH, RESULT_PATH, LOG_PATH_GPT = getArgs()
     if not os.path.exists(EXCEL_PATH):
         print("the excel path does not exist")
         sys.exit()
@@ -75,14 +79,14 @@ if __name__ == '__main__':
     init_dir(LOG_PATH, RESULT_PATH)
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
-    index = 9
+    index = 1
     not_list = [1,5]
     # for index in index_list:
     while True:
         if index in not_list:
             index = index + 1
             continue
-        if index > 9:
+        if index > 20:
             break
         skill = Skill(EXCEL_PATH, index)
         if skill.skillName == '<end_of_excel>':
@@ -91,9 +95,13 @@ if __name__ == '__main__':
             skill_log_path = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.skillName))
             if not os.path.exists(skill_log_path):
                 os.makedirs(skill_log_path)
-            gpt = askChatGPT(skill.skillName, skill_log_path, True)
-            fsm = FSM(gpt)
-            test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
-            UI.re_open_with_no_exit(spider)
+            skill_log_path_gpt = os.path.join(LOG_PATH_GPT, re.sub(r'(\W+)', '_', skill.skillName))
+            if not os.path.exists(skill_log_path_gpt):
+                print(skill_log_path_gpt, " does not exist")
+            else:    
+                gpt = askChatGPT(skill.skillName, skill_log_path, skill_log_path_gpt, True)
+                fsm = FSM(gpt)
+                test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
+                UI.re_open_with_no_exit(spider)
         index = index + 1
     UI.close_spider(spider)
