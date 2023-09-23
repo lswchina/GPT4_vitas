@@ -9,12 +9,12 @@ class getAns:
     def __init__(self, skillName, basicComds, sysComds, log_dir, gpt, fsm):
         self.timeStart = time.time()
         self.skillName = skillName
-        self.sysAns = sysComds[:5]
-        if len(self.sysAns) > 8:
-            self.sysAns.extend(sample(sysComds[5:], 3))
-        for ans in basicComds:
-            if ans not in self.sysAns:
-                self.sysAns.append(ans)
+        self.sysAns = sysComds
+        if len(basicComds) > 3:
+            for ans in sample(basicComds, 3):
+                ans0 = ans.lower()
+                if ans0 not in self.sysAns:
+                    self.sysAns.append(ans0)
         self.helpAns = []
         self.gpt = gpt
         self.FSM = fsm
