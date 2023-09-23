@@ -71,6 +71,13 @@ class FSM():
             if Inpt.isContextRelatedInput():
                 context_related_Inpts.append(Inpt)
         return context_related_Inpts
+
+    def getContextRelatedinputsOfQues(self, Ques):
+        context_related_inputs = []
+        for Inpt in self.getInputsOfQues(Ques):
+            if Inpt.isContextRelatedInput():
+                context_related_inputs.append(Inpt.get_input())
+        return context_related_inputs
     
     def getTransitionOfState(self, current_state):
         return self.__transitions.get(current_state, {})
@@ -262,6 +269,7 @@ class FSM():
         return state
 
     def __updateContextRelatedInputByCallGPT(self, lastQ, lastI, last_state):
+        context_related_inputs = self.getContextRelatedinputsOfQues(lastQ)
         if lastQ.isOutOfGPTTimes() == True:
             context_related_inputs_after = []
         else:
@@ -280,10 +288,12 @@ class FSM():
                         break
             if type_ == 1:
                 nouns = NLP.getNoneOfIQ(last_ques)
-            context_related_inputs = []
-            for Inpt in lastQ.getInputs():
-                if Inpt.isContextRelatedInput():
-                    context_related_inputs.append(Inpt.get_input())
             context_related_inputs_after = self.__gpt.step2_prompt2(lastI.get_input(), lastQ, context_related_inputs, type_, last_state, nouns)
+        context_related_inputs_delete = set(context_related_inputs).difference(set(context_related_inputs_after))
+        transition_of_last_state = self.__transitions.get(last_state, None)
+        if transition_of_last_state != None:
+            for inpt_del in context_related_inputs_delete:
+                transition_of_last_state.pop(inpt_del, None)
+            self.__transitions[last_state] = transition_of_last_state
         lastQ.addContextInputs(context_related_inputs_after)
         lastQ.addGPTTimes()
