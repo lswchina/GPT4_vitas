@@ -48,7 +48,7 @@ class askChatGPT:
                     gptResponse = True
                 elif gptResponse == True:
                     output_ = l.strip("\n")
-                    answerDict[input_] = [output_]
+                    answerDict[input_] = output_
                     input_ = ""
                     gptResponse = False
         return answerDict
