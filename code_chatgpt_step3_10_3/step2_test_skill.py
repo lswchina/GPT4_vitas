@@ -44,14 +44,20 @@ def ansSkill(index, output, fsm, rounds, request, lastQuestion, Inpt, time_befor
     if rounds == 0 and index == 0:
         output.addHelpAns(questions)
         Ques = output.selectQuestion(questions)
-        fsm.updateFSM(lastQuestion, Inpt, Ques)
-        return [Input(0, 'help', 0.1), Ques]
+        current_state = fsm.updateFSM(lastQuestion, Inpt, Ques)
+        Ques_of_current_state = fsm.has_ques(current_state)
+        Inpt = Ques_of_current_state.has_input('help')
+        fsm.addTimes(Ques_of_current_state, Inpt)
+        return [Inpt, Ques]
     if rounds == 1 and index == 0:
-        return output.getHelpResponse(questions, lastQuestion)
+        return output.getHelpResponse(questions, lastQuestion, Inpt)
     elif time.time() - time_before_testing >= Constant.TIME_LIMIT:
         Ques = output.selectQuestion(questions)
-        fsm.updateFSM(lastQuestion, Inpt, Ques)
-        return [Input(0, 'stop', 0.1), Ques]
+        current_state = fsm.updateFSM(lastQuestion, Inpt, Ques)
+        Ques_of_current_state = fsm.has_ques(current_state)
+        Inpt = Ques_of_current_state.has_input('stop')
+        fsm.addTimes(Ques_of_current_state, Inpt)
+        return [Inpt, Ques]
     else:
         return output.getResponse(questions, lastQuestion, Inpt)
     
