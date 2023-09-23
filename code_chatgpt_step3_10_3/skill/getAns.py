@@ -178,9 +178,9 @@ class getAns:
                 self.FSM.addInputs(Ques, self.sysAns, self.bascAnsToIW, [], [])
         return
 
-    def getHelpResponse(self, questions, lastQ):
+    def getHelpResponse(self, questions, lastQ, Inpt):
         self.addHelpAns(questions)
-        return self.getResponse(questions, lastQ, Input(0,'help', 0.1))
+        return self.getResponse(questions, lastQ, Inpt)
     
 if __name__ == '__main__':
     NLP.getNoneOfIQ("Please say a valid stock ticker symbol or name .")
