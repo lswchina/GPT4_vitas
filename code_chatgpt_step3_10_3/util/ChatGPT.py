@@ -21,6 +21,8 @@ class askChatGPT:
             Step2_Recorder_Path_gpt = os.path.join(log_dir_gpt, "step2_genInputs.txt")
             self.__answerDict1 = self.__getAnswerDict(1, Step1_Recorder_Path_gpt)
             self.__answerDict2 = self.__getAnswerDict(2, Step2_Recorder_Path_gpt)
+            print(self.__answerDict1)
+            print(self.__answerDict2)
         self.__useAPI = __useAPI
         self.__promptGlobal1 = ""
         self.__promptGlobal2 = ""
@@ -52,14 +54,6 @@ class askChatGPT:
         return answerDict
 
     def step1_chat(self, skill_output, state_list):
-        input_ = 'sentence: "' + skill_output + '", state list: ' + str(state_list)
-        state = self.__answerDict1.get(input_, None)
-        if state != None:
-            state = state.strip('"')
-            if state not in state_list and state != skill_output:
-                return skill_output
-            return state
-
         openai.api_key = os.getenv("OPENAI_API_KEY")
         messageBody = [
             {"role": "system", "content": "Help the user find a semantically identical state in the FSM."}
@@ -68,37 +62,43 @@ class askChatGPT:
         if self.__promptGlobal1 == "":
             hasGlobal1 = False
             self.getPromptGlobal1()
+        input_ = 'sentence: "' + skill_output + '", state list: ' + str(state_list)
         promptBody = 'Input: ' + input_ + '\n'
         promptBody = promptBody + "Output:"
         if hasGlobal1 == False:
             self.__record_result(self.__Step1_Recorder_Path, "User:\n" + self.__promptGlobal1 + promptBody + "\n")
         else:
             self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody + "\n")
-        if self.__useAPI == True:
-            messageBody.append({"role": "user", "content": self.__promptGlobal1 + promptBody})
-            state = ''
-            for i in range(3):
-                # self.update_duration_list()
-                try:
-                    responseBody = openai.ChatCompletion.create(
-                        model = "gpt-4",
-                        messages = messageBody,
-                        temperature = 0,
-                        max_tokens = 200
-                    )
-                    state = str(responseBody['choices'][0]['message']['content'])
-                    break
-                except Exception as e:
-                    print(e)
-        else:
-            if hasGlobal1 == False:
-                print("Step1_User:\n" + self.__promptGlobal1 + promptBody + "\n")
+        state = self.__answerDict1.get(input_, None)
+        if state == None:
+            if self.__useAPI == True:
+                messageBody.append({"role": "user", "content": self.__promptGlobal1 + promptBody})
+                state = ''
+                for i in range(3):
+                    # self.update_duration_list()
+                    try:
+                        responseBody = openai.ChatCompletion.create(
+                            model = "gpt-4",
+                            messages = messageBody,
+                            temperature = 0,
+                            max_tokens = 200
+                        )
+                        state = str(responseBody['choices'][0]['message']['content'])
+                        break
+                    except Exception as e:
+                        print(e)
             else:
-                print("Step1_User:\n" + promptBody + "\n")
-            state = input("Step1_GPT4:\n")
-        state = state.strip('"')
-        self.__record_result(self.__Step1_Recorder_Path, "GPT4:\n" + state + "\n")
+                if hasGlobal1 == False:
+                    print("Step1_User:\n" + self.__promptGlobal1 + promptBody + "\n")
+                else:
+                    print("Step1_User:\n" + promptBody + "\n")
+                state = input("Step1_GPT4:\n")
+            self.__record_result(self.__Step1_Recorder_Path, "GPT4:\n" + state + "\n")
+        else:
+            print("Input: ", input_, "; Output: ", state)
+            self.__record_result(self.__Step1_Recorder_Path, "GPT4_before:\n" + state + "\n")
         messageBody.append({"role": "assistant", "content": state})
+        state = state.strip('"')
         if state not in state_list and state != skill_output:
             state = self.step1_prompt2(state, skill_output, state_list, 'not_exist', messageBody)
         return state
@@ -160,23 +160,6 @@ class askChatGPT:
         return state2
 
     def step2_chat(self, Ques):
-        skill_output = Ques.get_ques()
-        input_ = 'skill: "' + skill_output + '"'
-        gpt_response = self.__answerDict2.get(input_, None)
-        if gpt_response != None:
-            index1 = gpt_response.find("[")
-            index2 = gpt_response.rfind("]")
-            if index1 != -1 and index2 != -1:
-                gpt_response = gpt_response[index1: index2 + 1]
-                response_list = list(eval(gpt_response))
-                if len(response_list) == 1 and response_list[0] == "":
-                    response_list = []
-            else:
-                response_list = []
-            if len(response_list) > 3 and (Ques.get_quesType() == 3 or Ques.get_quesType() == -1):
-                response_list = self.__remove_low_certain(response_list)
-            return response_list
-
         openai.api_key = os.getenv("OPENAI_API_KEY")
         messageBody = [
             {"role": "system", "content": "Find all the responses to the skill's sentence."}
@@ -185,35 +168,42 @@ class askChatGPT:
         if self.__promptGlobal2 == "":
             hasGlobal2 = False
             self.__getPromptGlobal2()
+        skill_output = Ques.get_ques()
+        input_ = 'skill: "' + skill_output + '"'
         promptBody = 'Input: ' + input_ + '\n'
         promptBody = promptBody + "Output:"
         if hasGlobal2 == False:
             self.__record_result(self.__Step2_Recorder_Path, "User:\n" + self.__promptGlobal2 + promptBody + "\n")
         else:
             self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody + "\n")
-        if self.__useAPI == True:
-            messageBody.append({"role": "user", "content": self.__promptGlobal2 + promptBody})
-            gpt_response = ''
-            for i in range(3):
-                # self.update_duration_list()
-                try:
-                    responseBody = openai.ChatCompletion.create(
-                        model = "gpt-4",
-                        messages = messageBody,
-                        temperature = 0,
-                        max_tokens = 300
-                    )
-                    gpt_response = str(responseBody['choices'][0]['message']['content'])
-                    break
-                except Exception as e:
-                    print(e)
-        else:
-            if hasGlobal2 == False:
-                print("Step2_User:\n" + self.__promptGlobal2 + promptBody + "\n")
+        gpt_response = self.__answerDict2.get(input_, None)
+        if gpt_response == None:
+            if self.__useAPI == True:
+                messageBody.append({"role": "user", "content": self.__promptGlobal2 + promptBody})
+                gpt_response = ''
+                for i in range(3):
+                    # self.update_duration_list()
+                    try:
+                        responseBody = openai.ChatCompletion.create(
+                            model = "gpt-4",
+                            messages = messageBody,
+                            temperature = 0,
+                            max_tokens = 300
+                        )
+                        gpt_response = str(responseBody['choices'][0]['message']['content'])
+                        break
+                    except Exception as e:
+                        print(e)
             else:
-                print("Step2_User:\n" + promptBody + "\n")
-            gpt_response = input("Step2_GPT4:\n")
-        self.__record_result(self.__Step2_Recorder_Path, "GPT4:\n" + gpt_response + "\n")
+                if hasGlobal2 == False:
+                    print("Step2_User:\n" + self.__promptGlobal2 + promptBody + "\n")
+                else:
+                    print("Step2_User:\n" + promptBody + "\n")
+                gpt_response = input("Step2_GPT4:\n")
+            self.__record_result(self.__Step2_Recorder_Path, "GPT4:\n" + gpt_response + "\n")
+        else:
+            print("Input: ", input_, "; Output: ", gpt_response)
+            self.__record_result(self.__Step2_Recorder_Path, "GPT4_before:\n" + gpt_response + "\n")
         messageBody.append({"role": "assistant", "content": gpt_response})
         self.step2_lastPrompt = messageBody
         index1 = gpt_response.find("[")
