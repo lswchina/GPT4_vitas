@@ -46,14 +46,10 @@ class Question():
         return self.__state
 
     def addSysInputs(self, sysAns):
-        sample_list = []
-        if len(sysAns) > 8:
-            sample_list = sample(sysAns[4:], 4)
-        for ind, ans in enumerate(sysAns):
-            if ind <= 3 or ans in sample_list:
-                new_input = Input(0, ans)
-                if new_input not in self.__Inpt_list:
-                    self.__Inpt_list.append(new_input)
+        for ans in sysAns:
+            new_input = Input(0, ans)
+            if new_input not in self.__Inpt_list:
+                self.__Inpt_list.append(new_input)
 
     def addHelpInputs(self, helpAns):
         for ans in helpAns:
