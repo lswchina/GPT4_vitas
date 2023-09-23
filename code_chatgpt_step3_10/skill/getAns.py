@@ -29,7 +29,7 @@ class getAns:
         response_list = self.gpt.step2_chat(Ques)
         return response_list
 
-    def getResponse(self, questions, lastQ, lastI):
+    def getResponse(self, questions, lastQ, lastI, next_input = ''):
         #find the question to answer and store in ques
         Ques = self.selectQuestion(questions)
         print("The question is ", Ques)
@@ -46,10 +46,13 @@ class getAns:
                 context_ans = []
             self.FSM.addInputs(Ques_of_current_state, self.sysAns, self.helpAns, context_ans)
             candidate_Inpt_list = self.FSM.getInputsOfQues(Ques_of_current_state)
-        state_info = self.FSM.getStateInfoOfState(current_state)
-        #Done: maybe transitions does not need Ques?
-        #Done: candidate_Inpt_list belongs to current_state, not Ques.get_ques()
-        ans = self.gpt.step3_chat(state_info, current_state, self.FSM.getTransitionOfState(current_state), candidate_Inpt_list)
+        if next_input == '':
+            state_info = self.FSM.getStateInfoOfState(current_state)
+            #Done: maybe transitions does not need Ques?
+            #Done: candidate_Inpt_list belongs to current_state, not Ques.get_ques()
+            ans = self.gpt.step3_chat(state_info, current_state, self.FSM.getTransitionOfState(current_state), candidate_Inpt_list)
+        else:
+            ans = next_input
         Inpt = Ques_of_current_state.has_input(ans)
         self.FSM.addTimes(Ques_of_current_state, Inpt)
         print(candidate_Inpt_list)

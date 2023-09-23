@@ -25,7 +25,7 @@ class getAns:
         response_list = self.gpt.step2_chat(Ques)
         return response_list
 
-    def getResponse(self, questions, lastQ, lastI):
+    def getResponse(self, questions, lastQ, lastI, next_input = ''):
         #find the question to answer and store in ques
         Ques = self.selectQuestion(questions)
         print("The question is ", Ques)
@@ -72,7 +72,10 @@ class getAns:
         #Done: maybe transitions does not need Ques?
         #Done: candidate_Inpt_list belongs to current_state, not Ques.get_ques()
         #ans = self.gpt.step3_chat(state_info, current_state, self.FSM.getTransitionOfState(current_state), candidate_Inpt_list)
-        Inpt = Ques_of_current_state.select_Inpt()
+        if next_input == '':
+            Inpt = Ques_of_current_state.select_Inpt()
+        else:
+            Inpt = Ques_of_current_state.has_input(next_input)
         self.FSM.addTimes(Ques_of_current_state, Inpt)
         print(candidate_Inpt_list)
         return [Inpt, Ques]
