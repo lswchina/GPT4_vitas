@@ -48,7 +48,7 @@ class askChatGPT:
                     gptResponse = True
                 elif gptResponse == True:
                     if type == 3:
-                        if output_.startswith("Output: "):
+                        if l.startswith("Output: "):
                             output_ = output_ + l.strip("\n")
                             answerDict[input_] = output_
                             input_ = ""
