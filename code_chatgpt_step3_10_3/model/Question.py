@@ -1,3 +1,4 @@
+import sys
 from model.Input import Input
 class Question():
     def __init__(self, ques):
@@ -105,7 +106,7 @@ class Question():
         return None
 
     def select_Inpt(self):
-        highest_weight = 0
+        highest_weight = -sys.maxsize - 1
         selectInpt = None
         for Inpt in self.__Inpt_list:
             weight = Inpt.get_weight()
