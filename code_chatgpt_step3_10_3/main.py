@@ -84,25 +84,29 @@ if __name__ == '__main__':
     init_dir(LOG_PATH, RESULT_PATH)
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
-    index = 11
-    # index_list = [11, 31, 34, 41]
+    index = 1
+    not_list = [1,5]
     # for index in index_list:
     while True:
-        skill = Skill(EXCEL_PATH, index)
-        skill_log_path = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.skillName))
-        if not os.path.exists(skill_log_path):
-            os.makedirs(skill_log_path)
-        skill_log_path_gpt = os.path.join(LOG_PATH_GPT, re.sub(r'(\W+)', '_', skill.skillName))
-        if not os.path.exists(skill_log_path_gpt):
-            print(skill_log_path_gpt, " does not exist")
+        if index in not_list:
             index = index + 1
             continue
-        gpt = askChatGPT(skill.skillName, skill_log_path, skill_log_path_gpt, True)
-        fsm = FSM(gpt)
+        if index > 20:
+            break
+        skill = Skill(EXCEL_PATH, index)
         if skill.skillName == '<end_of_excel>':
             break
         if skill.skillName != '':
-            test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
-            UI.re_open_with_no_exit(spider)
+            skill_log_path = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.skillName))
+            if not os.path.exists(skill_log_path):
+                os.makedirs(skill_log_path)
+            skill_log_path_gpt = os.path.join(LOG_PATH_GPT, re.sub(r'(\W+)', '_', skill.skillName))
+            if not os.path.exists(skill_log_path_gpt):
+                print(skill_log_path_gpt, " does not exist")
+            else:    
+                gpt = askChatGPT(skill.skillName, skill_log_path, skill_log_path_gpt, True)
+                fsm = FSM(gpt)
+                test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
+                UI.re_open_with_no_exit(spider)
         index = index + 1
     UI.close_spider(spider)

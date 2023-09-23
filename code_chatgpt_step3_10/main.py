@@ -82,17 +82,17 @@ if __name__ == '__main__':
         if index in not_list:
             index = index + 1
             continue
-        skill = Skill(EXCEL_PATH, index)
-        skill_log_path = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.skillName))
-        if not os.path.exists(skill_log_path):
-            os.makedirs(skill_log_path)
-        gpt = askChatGPT(skill.skillName, skill_log_path, True)
-        fsm = FSM(gpt)
-        if skill.skillName == '<end_of_excel>':
-            break
         if index > 20:
             break
+        skill = Skill(EXCEL_PATH, index)
+        if skill.skillName == '<end_of_excel>':
+            break
         if skill.skillName != '':
+            skill_log_path = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.skillName))
+            if not os.path.exists(skill_log_path):
+                os.makedirs(skill_log_path)
+            gpt = askChatGPT(skill.skillName, skill_log_path, True)
+            fsm = FSM(gpt)
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)
         index = index + 1
