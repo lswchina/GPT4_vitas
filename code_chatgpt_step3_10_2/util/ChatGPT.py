@@ -52,6 +52,7 @@ class askChatGPT:
                             output_ = output_ + l.strip("\n")
                             answerDict[input_] = output_
                             input_ = ""
+                            output_ = ""
                             gptResponse = False
                         else:
                             output_ = l
