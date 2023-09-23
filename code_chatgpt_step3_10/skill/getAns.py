@@ -79,7 +79,7 @@ class getAns:
                         question_type = 0
                     elif NLP.isIQAns(spacyRet):
                         question_type = 1
-                    elif NLP.isIQAns(spacyRet):
+                    elif NLP.isSQAns(spacyRet):
                         question_type = 2
                 else:
                     question_type = 3
