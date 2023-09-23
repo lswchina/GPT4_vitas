@@ -155,7 +155,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
             #detect problems
             p1, type = pro_detc.isUnrespondingVUI(Inpt, lastRequest, request, spider, fileTest)     #problem 1: unexpected exit
             if p1:
-                # Inpt = Input(0, 'What\'s the time')
+                # Inpt = Input(0, 'what\'s the time')
                 if type == 1:
                     if Stop == False:
                         log += "problem1----------unexpected exit!\n"
@@ -203,12 +203,13 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
         if lastQuestion.get_ques() != "<END>":
             for sign in Constant.StopSign:
                 if sign in Inpt.get_input():
-                    newInpt = Input(0, "What\'s the time", 0.1)
+                    Inpt = lastQuestion.has_input("what\'s the time")
+                    lastQuestion.addTimes(Inpt)
                     Ques = fsm.has_ques("<END>")
                     if Ques == None:
                         Ques = Question("<END>")
                         fsm.addQuesToQuesSet(Ques)
-                    fsm.updateFSM(lastQuestion, newInpt, Ques)
+                    fsm.updateFSM(lastQuestion, Inpt, Ques)
                     break
         if 'problem5' not in log and pro_detc.isUnavailable(skillStart, questions, skill.supportRegion):   #problem 5: unavailable skill
             log += "problem5----------unavailable skill!\n"

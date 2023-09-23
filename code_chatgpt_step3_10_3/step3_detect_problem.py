@@ -34,13 +34,13 @@ def isCrash(lastRequest, request):
 
 def isUnrespondingVUI(lastI, lastRequest, request, spider, FileName):
     if len(request) == 0:
-        Inpt = Input(0, 'What\'s the time', 0.1)
+        Inpt = Input(0, 'what\'s the time', 0.1)
         requests = UI.input_and_response(spider, Inpt, FileName, True)
         if len(requests) != 0:
             print(requests)
         if len(requests) == 0 or requests[-1][1] != 'Alexa':
-            if 'Pause' in lastI.get_input():
-                Inpt = Input(0, 'Resume', 0.1)
+            if 'pause' in lastI.get_input():
+                Inpt = Input(0, 'resume', 0.1)
                 print(Inpt.get_input())
                 requests = UI.input_and_response(spider, Inpt, FileName, True)
                 if len(requests) != 0 and requests[-1][1] != 'Alexa':
@@ -92,7 +92,7 @@ def privacyLeakage(request, gpt):
 def isUnstoppable(spider, lastInpt, FileName):
     for sign in Constant.StopSign:
         if sign in lastInpt.get_input():
-            Inpt = Input(0, 'What\'s the time', 0.1)
+            Inpt = Input(0, 'what\'s the time', 0.1)
             print(Inpt)
             requests = UI.input_and_response(spider, Inpt, FileName, True)
             if len(requests) != 0:

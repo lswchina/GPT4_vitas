@@ -372,7 +372,7 @@ class askChatGPT:
                     if times < 2:
                         better_Inpt.append(Inpt)
         if len(better_Inpt) == 0 and type_id_of_select_input == 2 and contain_low_times_crt == False:
-            better_inputs = ["help", "stop"]
+            better_inputs = ['help', 'pause', 'resume', 'stop', 'what\'s the time']
         elif len(better_Inpt) != 0:
             better_inputs_temp = []
             for Inpt in better_Inpt:
