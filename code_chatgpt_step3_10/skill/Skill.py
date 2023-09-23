@@ -279,6 +279,6 @@ class Skill:
     def getSysComds(self):
         if self.__sysComds == None:
             self.__sysComds = []
-            sysword = ['pause', 'resume', 'stop', 'what\'s the time']
+            sysword = ['help', 'pause', 'resume', 'stop', 'what\'s the time']
             self.__sysComds.extend(sysword)
         return self.__sysComds
