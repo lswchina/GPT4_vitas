@@ -190,7 +190,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
         if pro_detc.isUnstoppable(spider, Inpt, fileTest):   #problem 3: unstoppable skill
             log += "problem3----------unstoppable skill!\n"
             addProblem(os.path.join(res_dir, "problem3.txt"), skill.skillName)
-        if lastQuestion.get_ques() != "<END>":
+        if lastQuestion == None or lastQuestion.get_ques() != "<END>":
             for sign in Constant.StopSign:
                 if sign in Inpt.get_input():
                     Inpt = lastQuestion.has_input("what\'s the time")
