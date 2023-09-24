@@ -340,7 +340,7 @@ class NLP():
         instr_list = ["say", "ask", "tell", "give"]
         for word in instr_list:
             if word in question:
-                return False
+                return None
         Answers = {
             "What": [''],
             "what": [''],
