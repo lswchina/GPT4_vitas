@@ -75,14 +75,10 @@ if __name__ == '__main__':
     init_dir(LOG_PATH, RESULT_PATH)
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
-    index = 9
-    not_list = [1,5]
+    index = 2
     # for index in index_list:
     while True:
-        if index in not_list:
-            index = index + 1
-            continue
-        if index > 9:
+        if index > 6:
             break
         skill = Skill(EXCEL_PATH, index)
         if skill.skillName == '<end_of_excel>':
