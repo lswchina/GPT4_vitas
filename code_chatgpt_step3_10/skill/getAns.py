@@ -141,16 +141,17 @@ class getAns:
                         if ans0 not in self.helpAns:
                             self.helpAns.append(ans0)
         if len(self.helpAns) == 0:
-            Ques = self.FSM.has_ques(question[-1])
+            ques = questions[-1]
+            Ques = self.FSM.has_ques(ques)
             if Ques == None:
                 type_ = -1
-                if NLP.isWhQ(question[-1]):
+                if NLP.isWhQ(ques):
                     type_ = 3
                 else:
-                    spacyRet = NLP.imergeNones(question[-1])
+                    spacyRet = NLP.imergeNones(ques)
                     if NLP.isYNAns(spacyRet):
                         type_ = 0
-                Ques = Question(question)
+                Ques = Question(ques)
                 response_list = []
                 if type_ != -1:
                     Ques.setType(type_)
