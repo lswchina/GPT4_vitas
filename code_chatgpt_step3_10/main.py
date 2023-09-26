@@ -75,11 +75,11 @@ if __name__ == '__main__':
     init_dir(LOG_PATH, RESULT_PATH)
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
-    index = 2
-    # for index in index_list:
-    while True:
-        if index > 6:
-            break
+    index_list = [3, 6]
+    for index in index_list:
+    # while True:
+        # if index > 6:
+        #     break
         skill = Skill(EXCEL_PATH, index)
         if skill.skillName == '<end_of_excel>':
             break
@@ -91,5 +91,5 @@ if __name__ == '__main__':
             fsm = FSM(gpt)
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)
-        index = index + 1
+        # index = index + 1
     UI.close_spider(spider)
