@@ -190,7 +190,7 @@ class getAns:
                     Ques.setType(type_)
                     response_list = self.gpt.step2_chat(Ques)
                 self.FSM.addQuesToQuesSet(Ques)
-                self.FSM.addInputs(Ques, self.sysAns, [], response_list)
+                self.FSM.addInputs(Ques, self.sysAns, self.bascAnsToIW, [], response_list)
         return
 
     def getHelpResponse(self, questions, lastQ, Inpt):
