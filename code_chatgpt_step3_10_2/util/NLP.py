@@ -117,7 +117,7 @@ class NLP():
     @staticmethod
     def isSQAns(spacyRet):
         for word in reversed(spacyRet):
-            if NLP.getTokenDep(word) == "conj" and NLP.getTokenPos(word) != 'VERB':
+            if NLP.getTokenDep(word) == "conj":
                 return True
         return False
 
