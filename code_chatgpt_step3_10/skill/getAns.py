@@ -149,7 +149,7 @@ class getAns:
                 else:
                     spacyRet = NLP.imergeNones(question[-1])
                     if NLP.isYNAns(spacyRet):
-                        type_ = 3
+                        type_ = 0
                 Ques = Question(question)
                 response_list = []
                 if type_ != -1:
