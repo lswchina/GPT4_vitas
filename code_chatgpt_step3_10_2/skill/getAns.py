@@ -66,9 +66,6 @@ class getAns:
         Ques_list = []
         Ques_from_Ques_list = None
         reward1 = 0
-        whQues_list = []
-        Ques_from_whQues_list = None
-        reward2 = 0
         for question in reversed(questions):
             Ques = self.FSM.has_ques(question)
             if Ques != None:
@@ -92,25 +89,15 @@ class getAns:
                     Ques.setType(question_type)
                 self.FSM.addQuesToQuesSet(Ques)
             if question_type != -1:
-                if question_type >= 0 and question_type <= 2:
+                if question_type >= 0 and question_type <= 3:
                     Ques_list.append(Ques)
                     r = Ques.get_reward()
                     if r > reward1 or (r == reward1 and Ques_from_Ques_list == None):
                         reward1 = r
                         Ques_from_Ques_list = Ques
-                elif question_type == 3:
-                    whQues_list.append(Ques)
-                    r = Ques.get_reward()
-                    if r > reward2 or (r == reward2 and Ques_from_whQues_list == None):
-                        reward2 = r
-                        Ques_from_whQues_list = Ques
         if len(Ques_list) != 0:
             print("The question list is ", str(Ques_list))
             Ques = self.__pull(Ques_list, Ques_from_Ques_list)
-            return Ques
-        elif len(whQues_list) != 0:
-            print("The wh question list is ", str(whQues_list))
-            Ques = self.__pull(whQues_list, Ques_from_whQues_list)
             return Ques
         else:
             if len(questions) > 0:
