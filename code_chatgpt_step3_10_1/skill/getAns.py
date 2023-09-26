@@ -142,9 +142,20 @@ class getAns:
         if len(self.helpAns) == 0:
             Ques = self.FSM.has_ques(question[-1])
             if Ques == None:
+                type_ = -1
+                if NLP.isWhQ(question[-1]):
+                    type_ = 3
+                else:
+                    spacyRet = NLP.imergeNones(question[-1])
+                    if NLP.isYNAns(spacyRet):
+                        type_ = 0
                 Ques = Question(question)
+                response_list = []
+                if type_ != -1:
+                    Ques.setType(type_)
+                    response_list = self.gpt.step2_chat(Ques)
                 self.FSM.addQuesToQuesSet(Ques)
-                self.FSM.addInputs(Ques, self.sysAns, [], [])
+                self.FSM.addInputs(Ques, self.sysAns, [], response_list)
         return
 
     def getHelpResponse(self, questions, lastQ, Inpt):
