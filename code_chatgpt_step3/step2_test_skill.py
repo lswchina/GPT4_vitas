@@ -69,7 +69,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
     endWithStop = False
     i = 0
     time_before_testing = time.time()
-    while i <= 2 and time.time() - time_start < Constant.TIME_LIMIT:
+    while i <= 2 and time.time() - time_before_testing < Constant.TIME_LIMIT:
         time_start = time.time()
         fileTest = os.path.join(skill_log_path, skillName_to_dirName + str(i) + ".txt")
         log = ''
@@ -85,7 +85,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
         if invalidRequest(request) or len(request) == 0:
             continue
 
-        while Stop == False and getAlexa(request) is not None and skillStart == False and time.time() - time_start < Constant.TIME_LIMIT:
+        while Stop == False and getAlexa(request) is not None and skillStart == False and time.time() - time_before_testing < Constant.TIME_LIMIT:
             print(request)
             result = pro_detc.unexpectedSkills(request, skill.skillName, skill.supportRegion) #problem 4: unexpected skills started
             if result[0] == True:
@@ -127,7 +127,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
                 break
 
         rounds = 0
-        while Stop == False and time.time() - time_start < Constant.TIME_LIMIT:
+        while Stop == False and time.time() - time_before_testing < Constant.TIME_LIMIT:
             skillStart = True
             Inpt, lastQuestion = ansSkill(i, output, fsm, rounds, request, lastQuestion, Inpt, time_before_testing)
             print(Inpt)
