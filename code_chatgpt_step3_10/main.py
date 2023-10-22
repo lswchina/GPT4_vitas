@@ -16,7 +16,7 @@ os.environ["https_proxy"] = "http://127.0.0.1:7890"
 def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark2022.xlsx")
-    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gpt4_vitas/")
+    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gpt4_vitas_10min/")
     parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/gpt4_vitas/result/")
     args = parser.parse_args()
     EXCEL_PATH = "../dataset_2022/" + args.excel_name
