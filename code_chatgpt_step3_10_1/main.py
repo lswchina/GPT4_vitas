@@ -41,7 +41,7 @@ def init_dir(LOG_PATH, RESULT_PATH):
         os.makedirs(LOG_PATH)
 
 def init_constant():
-    Constant.CONFIG_PATH = '../config/config009.ini'
+    Constant.CONFIG_PATH = '../config/config010.ini'
     Constant.LOGOUT_URL = "https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fyourstore%2Fhome%3Fie%3DUTF8%26action%3Dsign-out%26path%3D%252Fgp%252Fyourstore%252Fhome%26ref_%3Dnav_AccountFlyout_signout%26signIn%3D1%26useRedirectOnSuccess%3D1"
     Constant.CHROME_PATH = "../chrome/chromedriver_94"
     Constant.COOKIE_DIR = "../cookie/console_cookie7.pkl"
@@ -79,14 +79,10 @@ if __name__ == '__main__':
     init_dir(LOG_PATH, RESULT_PATH)
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
-    index = 4
-    not_list = [1,5]
+    index = 2
     # for index in index_list:
     while True:
-        if index in not_list:
-            index = index + 1
-            continue
-        if index > 20:
+        if index > 6:
             break
         skill = Skill(EXCEL_PATH, index)
         if skill.skillName == '<end_of_excel>':
