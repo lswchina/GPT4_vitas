@@ -352,8 +352,9 @@ class askChatGPT:
             response2 = input("Step3_GPT4_2:\n")
         self.__record_result(self.__Step3_Recorder_Path, "GPT4:\n" + response2 + "\n")
         inQuoteWords = []
-        # response2 = response2.split("Output: ")[1]
-        response_split = response2.split("\"")
+        response_split = response2.split("Output: ")
+        if len(response_split) == 1:
+            response_split = response2.split("\"")
         if len(response_split) == 1 or len(response_split) == 2:
             inQuoteWords.append(response2)
         else:
