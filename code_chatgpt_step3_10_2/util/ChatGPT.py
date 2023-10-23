@@ -111,6 +111,8 @@ class askChatGPT:
         state = state.strip('"')
         if state not in state_list and state != skill_output:
             state = self.step1_prompt2(state, skill_output, state_list, 'not_exist', messageBody)
+        elif state == "<START>":
+            state = self.step1_prompt2(state, skill_output, state_list, 'wrong', messageBody)
         return state
 
     def getPromptGlobal1(self):
