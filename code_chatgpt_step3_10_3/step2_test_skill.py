@@ -85,7 +85,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
         if invalidRequest(request) or len(request) == 0:
             continue
 
-        while Stop == False and getAlexa(request) is not None and skillStart == False:
+        while Stop == False and getAlexa(request) is not None and skillStart == False and rounds < 4:
             print(request)
             result = pro_detc.unexpectedSkills(request, skill.skillName, skill.supportRegion) #problem 4: unexpected skills started
             if result[0] == True:
