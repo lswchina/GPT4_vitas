@@ -125,9 +125,9 @@ class askChatGPT:
                  }
         self.__promptGlobal1 = "We use a finite state machine to respresent an Alexa Skill's behavior. " 
         self.__promptGlobal1 = self.__promptGlobal1 + "The skill's output sentences are mapped to states in the FSM. "
-        self.__promptGlobal1 = self.__promptGlobal1 + "Semantically identical sentences are mapped to the same state. "
-        self.__promptGlobal1 = self.__promptGlobal1 + "Given a sentence and the FSM's state list, please try to find a semantically identical state in the state list. "
-        self.__promptGlobal1 = self.__promptGlobal1 + "If the semantically identical state is found, output the state. "
+        self.__promptGlobal1 = self.__promptGlobal1 + "Semantically similar sentences are mapped to the same state. "
+        self.__promptGlobal1 = self.__promptGlobal1 + "Given a sentence and the FSM's state list, please try to find a semantically similar state in the state list. "
+        self.__promptGlobal1 = self.__promptGlobal1 + "If the semantically similar state is found, output the state. "
         self.__promptGlobal1 = self.__promptGlobal1 + "Otherwise, output the sentence itself.\n"
         self.__promptGlobal1 = self.__promptGlobal1 + "For example:\n"
         for skill_output in step1_Example.keys():
@@ -138,11 +138,11 @@ class askChatGPT:
     def step1_prompt2(self, state, skill_output, state_list, errorMessage, messageBody):
         if errorMessage == 'not_exist':
             promptBody2 = "The \"" + state + "\" is not in the state list " + str(state_list) + ". "
-            promptBody2 = promptBody2 + "Find a semantically identical state from the state list " + str(state_list) + " for the response \"" + skill_output + "\"."
+            promptBody2 = promptBody2 + "Find a semantically similar state from the state list " + str(state_list) + " for the response \"" + skill_output + "\"."
         elif errorMessage == 'wrong':
-            promptBody2 = "The state \"" + state + "\" and sentence " + skill_output + " are not semantically identical."
+            promptBody2 = "The state \"" + state + "\" and sentence " + skill_output + " are not semantically similar because they have different input events."
         else:
-            promptBody2 = "The state \"" + errorMessage + "\" and sentence " + skill_output + " are semantically idential."
+            promptBody2 = "The state \"" + errorMessage + "\" and sentence " + skill_output + " are semantically similar."
         self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
             messageBody.append({"role": "user", "content": promptBody2})
