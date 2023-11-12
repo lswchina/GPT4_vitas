@@ -344,7 +344,7 @@ class askChatGPT:
                         }
         
         self.__promptGlobal3 = "We use a finite state machine to represent an Alexa Skill's behavior. "
-        self.__promptGlobal3 = self.__promptGlobal3 + "Our FSM has Q representing the state set, Σ representing the input event dictionary(with key of input event and value of its invocation times) and δ represent the transition set. "
+        self.__promptGlobal3 = self.__promptGlobal3 + "Our FSM has Q(state set), Σ(input event dictionary(key: input event, value: invocation times)) and δ(transition set). "
         self.__promptGlobal3 = self.__promptGlobal3 + "The transition from <current state> to <next state> by <input1> is represented as [<current state>, <input1>, <next state>]. "
         self.__promptGlobal3 = self.__promptGlobal3 + "If <next state> = <current state>, <input1> leads to a repeated state. "
         self.__promptGlobal3 = self.__promptGlobal3 + "If <next state> contains error information, <input1> leads to an error state.\n"
