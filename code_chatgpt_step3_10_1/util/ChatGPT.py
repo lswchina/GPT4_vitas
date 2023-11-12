@@ -199,8 +199,7 @@ class askChatGPT:
                         "Please tell me the date you are traveling.": '["today", "tomorrow", "2023.12.31", "National Day"]',
                         "What animal sound do you like to hear?": '["rabbit", "rat", "cat", "dog", "monkey", "tiger", "lion"]'
                         }
-        self.__promptGlobal2 = "Given an Alexa skill called " + self.skillName + "."
-        self.__promptGlobal2 = self.__promptGlobal2 + "For a sentence of this skill and its context, find all the responses to the sentence in a python list."
+        self.__promptGlobal2 = "Given a sentence and its context, find all the responses to the sentence in a python list."
         self.__promptGlobal2 = self.__promptGlobal2 + "The responses should be precious and simple.\n"
         self.__promptGlobal2 = self.__promptGlobal2 + "For example:\n"
         for skill_output in step2_Example.keys():
