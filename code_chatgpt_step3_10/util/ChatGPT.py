@@ -1,6 +1,7 @@
 import os
 import openai
 import random
+from copy import deepcopy
 
 os.environ["http_proxy"] = "http://127.0.0.1:7890"
 os.environ["https_proxy"] = "http://127.0.0.1:7890"
@@ -20,12 +21,18 @@ class askChatGPT:
         self.__promptGlobal1 = ""
         self.__promptGlobal2 = ""
         self.__promptGlobal3 = ""
+        self.__messageBody1 = [
+            {"role": "system", "content": "Help the user find a semantically identical state in the FSM."}
+        ]
+        self.__messageBody2 = [
+            {"role": "system", "content": "Find all the responses to the skill's sentence."}
+        ]
+        self.__messageBody3 = [
+            {"role": "system", "content": "Choose one input from the input event list to cover more future states."}
+        ]
 
     def step1_chat(self, skill_output, state_list):
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        messageBody = [
-            {"role": "system", "content": "Help the user find a semantically identical state in the FSM."}
-        ]
         hasGlobal1 = True
         if self.__promptGlobal1 == "":
             hasGlobal1 = False
@@ -34,17 +41,18 @@ class askChatGPT:
         promptBody = promptBody + "Output:"
         if hasGlobal1 == False:
             self.__record_result(self.__Step1_Recorder_Path, "User:\n" + self.__promptGlobal1 + promptBody + "\n")
+            self.__messageBody1.append({"role": "user", "content": self.__promptGlobal1 + promptBody})
         else:
             self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody + "\n")
+            self.__messageBody1.append({"role": "user", "content": promptBody})
         if self.__useAPI == True:
-            messageBody.append({"role": "user", "content": self.__promptGlobal1 + promptBody})
             state = ''
             for i in range(3):
                 # self.update_duration_list()
                 try:
                     responseBody = openai.ChatCompletion.create(
                         model = "gpt-4",
-                        messages = messageBody,
+                        messages = self.__messageBody1,
                         temperature = 0,
                         max_tokens = 200
                     )
@@ -60,11 +68,13 @@ class askChatGPT:
             state = input("Step1_GPT4:\n")
         state = state.strip('"')
         self.__record_result(self.__Step1_Recorder_Path, "GPT4:\n" + state + "\n")
-        messageBody.append({"role": "assistant", "content": state})
+        self.__messageBody1.append({"role": "assistant", "content": state})
         if state not in state_list and state != skill_output:
-            state = self.step1_prompt2(state, skill_output, state_list, 'not_exist', messageBody)
+            state = self.step1_prompt2(state, skill_output, state_list, 'not_exist', self.__messageBody1)
         elif state == "<START>":
-            state = self.step1_prompt2(state, skill_output, state_list, 'wrong', messageBody)
+            state = self.step1_prompt2(state, skill_output, state_list, 'wrong', self.__messageBody1)
+        if len(self.__messageBody1) > 3:
+            self.__messageBody1 = self.__messageBody1[:3]
         return state
 
     def getPromptGlobal1(self):
@@ -77,9 +87,9 @@ class askChatGPT:
                  }
         self.__promptGlobal1 = "We use a finite state machine to respresent an Alexa Skill's behavior. " 
         self.__promptGlobal1 = self.__promptGlobal1 + "The skill's output sentences are mapped to states in the FSM. "
-        self.__promptGlobal1 = self.__promptGlobal1 + "Semantically identical sentences are mapped to the same state. "
-        self.__promptGlobal1 = self.__promptGlobal1 + "Given a sentence and the FSM's state list, please try to find a semantically identical state in the state list. "
-        self.__promptGlobal1 = self.__promptGlobal1 + "If the semantically identical state is found, output the state. "
+        self.__promptGlobal1 = self.__promptGlobal1 + "Semantically similar sentences are mapped to the same state. "
+        self.__promptGlobal1 = self.__promptGlobal1 + "Given a sentence and the FSM's state list, please try to find a semantically similar state in the state list. "
+        self.__promptGlobal1 = self.__promptGlobal1 + "If the semantically similar state is found, output the state. "
         self.__promptGlobal1 = self.__promptGlobal1 + "Otherwise, output the sentence itself.\n"
         self.__promptGlobal1 = self.__promptGlobal1 + "For example:\n"
         for skill_output in step1_Example.keys():
@@ -90,11 +100,11 @@ class askChatGPT:
     def step1_prompt2(self, state, skill_output, state_list, errorMessage, messageBody):
         if errorMessage == 'not_exist':
             promptBody2 = "The \"" + state + "\" is not in the state list " + str(state_list) + ". "
-            promptBody2 = promptBody2 + "Find a semantically identical state from the state list " + str(state_list) + " for the response \"" + skill_output + "\"."
+            promptBody2 = promptBody2 + "Find a semantically similar state from the state list " + str(state_list) + " for the response \"" + skill_output + "\"."
         elif errorMessage == 'wrong':
-            promptBody2 = "The state \"" + state + "\" and sentence " + skill_output + " are not semantically identical."
+            promptBody2 = "The state \"" + state + "\" and sentence " + skill_output + " are not semantically similar because they have different input events."
         else:
-            promptBody2 = "The state \"" + errorMessage + "\" and sentence " + skill_output + " are semantically idential."
+            promptBody2 = "The state \"" + errorMessage + "\" and sentence " + skill_output + " are semantically similar."
         self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
             messageBody.append({"role": "user", "content": promptBody2})
@@ -125,9 +135,6 @@ class askChatGPT:
 
     def step2_chat(self, Ques):
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        messageBody = [
-            {"role": "system", "content": "Find all the responses to the skill's sentence."}
-        ]
         hasGlobal2 = True
         if self.__promptGlobal2 == "":
             hasGlobal2 = False
@@ -137,17 +144,18 @@ class askChatGPT:
         promptBody = promptBody + "Output:"
         if hasGlobal2 == False:
             self.__record_result(self.__Step2_Recorder_Path, "User:\n" + self.__promptGlobal2 + promptBody + "\n")
+            self.__messageBody2.append({"role": "user", "content": self.__promptGlobal2 + promptBody})
         else:
             self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody + "\n")
+            self.__messageBody2.append({"role": "user", "content": promptBody})
         if self.__useAPI == True:
-            messageBody.append({"role": "user", "content": self.__promptGlobal2 + promptBody})
             gpt_response = ''
             for i in range(3):
                 # self.update_duration_list()
                 try:
                     responseBody = openai.ChatCompletion.create(
                         model = "gpt-4",
-                        messages = messageBody,
+                        messages = self.__messageBody2,
                         temperature = 0,
                         max_tokens = 300
                     )
@@ -162,8 +170,10 @@ class askChatGPT:
                 print("Step2_User:\n" + promptBody + "\n")
             gpt_response = input("Step2_GPT4:\n")
         self.__record_result(self.__Step2_Recorder_Path, "GPT4:\n" + gpt_response + "\n")
-        messageBody.append({"role": "assistant", "content": gpt_response})
-        self.step2_lastPrompt = messageBody
+        self.__messageBody2.append({"role": "assistant", "content": gpt_response})
+        self.step2_lastPrompt = deepcopy(self.__messageBody2)
+        if len(self.__messageBody2) > 3:
+            self.__messageBody2 = self.__messageBody2[:3]
         index1 = gpt_response.find("[")
         index2 = gpt_response.rfind("]")
         if index1 != -1 and index2 != -1:
@@ -253,8 +263,7 @@ class askChatGPT:
                         "Please tell me the date you are traveling.": '["today", "tomorrow", "2023.12.31", "National Day"]',
                         "What animal sound do you like to hear?": '["rabbit", "rat", "cat", "dog", "monkey", "tiger", "lion"]'
                         }
-        self.__promptGlobal2 = "Given an Alexa skill called " + self.skillName + "."
-        self.__promptGlobal2 = self.__promptGlobal2 + "For a sentence of this skill and its context, find all the responses to the sentence in a python list."
+        self.__promptGlobal2 = "Given a sentence and its context, find all the responses to the sentence in a python list."
         self.__promptGlobal2 = self.__promptGlobal2 + "The responses should be precious and simple.\n"
         self.__promptGlobal2 = self.__promptGlobal2 + "For example:\n"
         for skill_output in step2_Example.keys():
@@ -269,9 +278,6 @@ class askChatGPT:
     def step3_chat(self, states, state, transitions, candidate_Inpt_list):
         candidate_input_list = [i.get_input() for i in candidate_Inpt_list]
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        messageBody = [
-            {"role": "system", "content": "Choose one input from the input event list to cover more future states."}
-        ]
         skill_state_info, candidate_input_set_to_weight = self.__gen_prompt_for_step3(states, state, transitions, candidate_Inpt_list, candidate_input_list)
         hasGlobal3 = True
         if self.__promptGlobal3 == "":
@@ -281,17 +287,18 @@ class askChatGPT:
         promptBody = promptBody + "Thought:"
         if hasGlobal3 == False:
             self.__record_result(self.__Step3_Recorder_Path, "User:\n" + self.__promptGlobal3 + promptBody + "\n")
+            self.__messageBody3.append({"role": "user", "content": self.__promptGlobal3 + promptBody})
         else:
             self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody + "\n")
+            self.__messageBody3.append({"role": "user", "content": promptBody})
         if self.__useAPI == True:
-            messageBody.append({"role": "user", "content": self.__promptGlobal3 + promptBody})
             response = ''
             for i in range(3):
                 # self.update_duration_list()
                 try:
                     responseBody = openai.ChatCompletion.create(
                         model = "gpt-4",
-                        messages = messageBody,
+                        messages = self.__messageBody3,
                         temperature = 0,
                         max_tokens = 400
                     )
@@ -307,7 +314,7 @@ class askChatGPT:
             response = input("Step3_GPT4:\n")
 
         self.__record_result(self.__Step3_Recorder_Path, "GPT4:\n" + response + "\n")
-        messageBody.append({"role": "assistant", "content": response})
+        self.__messageBody3.append({"role": "assistant", "content": response})
         select_input = ''
         inQuoteWords = []
         response = response.split("Output: ")[1]
@@ -334,11 +341,13 @@ class askChatGPT:
             if select_input != '':
                 break
         if select_input == '':
-            select_input = self.step3_prompt2(response, [], candidate_input_list, messageBody)
+            select_input = self.step3_prompt2(response, [], candidate_input_list, self.__messageBody3)
         else:
             better_inputs = self.__find_better_inputs(candidate_input_set_to_weight, candidate_Inpt_list, select_input)
             if len(better_inputs) != 0:
-                select_input = self.step3_prompt2(response, better_inputs, [], messageBody)
+                select_input = self.step3_prompt2(response, better_inputs, [], self.__messageBody3)
+        if len(self.__messageBody3) > 3:
+            self.__messageBody3 = self.__messageBody3[:3]
         return select_input
 
     def __find_better_inputs(self, candidate_input_set_to_weight, candidate_Inpt_list, select_input):
@@ -395,7 +404,7 @@ class askChatGPT:
                         }
         
         self.__promptGlobal3 = "We use a finite state machine to represent an Alexa Skill's behavior. "
-        self.__promptGlobal3 = self.__promptGlobal3 + "Our FSM has Q representing the state set, Σ representing the input event dictionary(with key of input event and value of its invocation times) and δ represent the transition set. "
+        self.__promptGlobal3 = self.__promptGlobal3 + "Our FSM has Q(state set), Σ(input event dictionary(key: input event, value: invocation times)) and δ(transition set). "
         self.__promptGlobal3 = self.__promptGlobal3 + "The transition from <current state> to <next state> by <input1> is represented as [<current state>, <input1>, <next state>]. "
         self.__promptGlobal3 = self.__promptGlobal3 + "If <next state> = <current state>, <input1> leads to a repeated state. "
         self.__promptGlobal3 = self.__promptGlobal3 + "If <next state> contains error information, <input1> leads to an error state.\n"

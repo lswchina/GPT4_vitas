@@ -26,6 +26,12 @@ class askChatGPT:
         self.__useAPI = __useAPI
         self.__promptGlobal2 = ""
         self.__promptGlobal3 = ""
+        self.__messageBody2 = [
+            {"role": "system", "content": "Find all the responses to the skill's sentence."}
+        ]
+        self.__messageBody3 = [
+            {"role": "system", "content": "Choose one input from the input event list to cover more future states."}
+        ]
 
     def __getAnswerDict(self, type, log_path):
         answerDict = {}
@@ -65,9 +71,6 @@ class askChatGPT:
 
     def step2_chat(self, Ques):
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        messageBody = [
-            {"role": "system", "content": "Find all the responses to the skill's sentence."}
-        ]
         hasGlobal2 = True
         if self.__promptGlobal2 == "":
             hasGlobal2 = False
@@ -78,19 +81,20 @@ class askChatGPT:
         promptBody = promptBody + "Output:"
         if hasGlobal2 == False:
             self.__record_result(self.__Step2_Recorder_Path, "User:\n" + self.__promptGlobal2 + promptBody + "\n")
+            self.__messageBody2.append({"role": "user", "content": self.__promptGlobal2 + promptBody})
         else:
             self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody + "\n")
+            self.__messageBody2.append({"role": "user", "content": promptBody})
         gpt_response = self.__answerDict2.get(input_, None)
         if gpt_response == None:
             if self.__useAPI == True:
-                messageBody.append({"role": "user", "content": self.__promptGlobal2 + promptBody})
                 gpt_response = ''
                 for i in range(3):
                     # self.update_duration_list()
                     try:
                         responseBody = openai.ChatCompletion.create(
                             model = "gpt-4",
-                            messages = messageBody,
+                            messages = self.__messageBody2,
                             temperature = 0,
                             max_tokens = 300
                         )
@@ -108,8 +112,10 @@ class askChatGPT:
         else:
             print("Input: ", input_, "; Output: ", gpt_response)
             self.__record_result(self.__Step2_Recorder_Path, "GPT4_before:\n" + gpt_response + "\n")
-        messageBody.append({"role": "assistant", "content": gpt_response})
-        self.step2_lastPrompt = messageBody
+        self.__messageBody2.append({"role": "assistant", "content": gpt_response})
+        self.step2_lastPrompt = self.__messageBody2
+        if len(self.__messageBody2) > 3:
+            self.__messageBody2 = self.__messageBody2[:3]
         index1 = gpt_response.find("[")
         index2 = gpt_response.rfind("]")
         if index1 != -1 and index2 != -1:
@@ -214,9 +220,6 @@ class askChatGPT:
     def step3_chat(self, states, state, transitions, candidate_Inpt_list):
         candidate_input_list = [i.get_input() for i in candidate_Inpt_list]
         openai.api_key = os.getenv("OPENAI_API_KEY")
-        messageBody = [
-            {"role": "system", "content": "Choose one input from the input event list to cover more future states."}
-        ]
         hasGlobal3 = True
         if self.__promptGlobal3 == "":
             hasGlobal3 = False
@@ -226,19 +229,20 @@ class askChatGPT:
         promptBody = promptBody + "Thought:"
         if hasGlobal3 == False:
             self.__record_result(self.__Step3_Recorder_Path, "User:\n" + self.__promptGlobal3 + promptBody + "\n")
+            self.__messageBody3.append({"role": "user", "content": self.__promptGlobal3 + promptBody})
         else:
             self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody + "\n")
+            self.__messageBody3.append({"role": "user", "content": promptBody})
         response = self.__answerDict3.get(input_, None)
         if response == None:
             if self.__useAPI == True:
-                messageBody.append({"role": "user", "content": self.__promptGlobal3 + promptBody})
                 response = ''
                 for i in range(3):
                     # self.update_duration_list()
                     try:
                         responseBody = openai.ChatCompletion.create(
                             model = "gpt-4",
-                            messages = messageBody,
+                            messages = self.__messageBody3,
                             temperature = 0,
                             max_tokens = 400
                         )
@@ -256,7 +260,7 @@ class askChatGPT:
         else:
             print("Input: ", input_, "; Output: ", response)
             self.__record_result(self.__Step3_Recorder_Path, "GPT4_before:\n" + response + "\n")
-        messageBody.append({"role": "assistant", "content": response})
+        self.__messageBody3.append({"role": "assistant", "content": response})
         select_input = ''
         inQuoteWords = []
         response = response.split("Output: ")[1]
@@ -283,11 +287,13 @@ class askChatGPT:
             if select_input != '':
                 break
         if select_input == '':
-            select_input = self.step3_prompt2(response, [], candidate_input_list, messageBody)
+            select_input = self.step3_prompt2(response, [], candidate_input_list, self.__messageBody3)
         else:
             better_inputs = self.__find_better_inputs(candidate_input_set_to_weight, candidate_Inpt_list, select_input)
             if len(better_inputs) != 0:
-                select_input = self.step3_prompt2(response, better_inputs, [], messageBody)
+                select_input = self.step3_prompt2(response, better_inputs, [], self.__messageBody3)
+        if len(self.__messageBody3) > 3:
+            self.__messageBody3 = self.__messageBody3[:3]
         return select_input
 
     def __find_better_inputs(self, candidate_input_set_to_weight, candidate_Inpt_list, select_input):
