@@ -113,8 +113,10 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
                 break
             #answer alexa
             alexa_response = getAlexa(request)
-            if alexa_response is not None:
-                questions = NLP.splitSentence(alexa_response)
+            if alexa_response is None:
+                Stop = True
+                break
+            questions = NLP.splitSentence(alexa_response)
             Inpt = ansAlexa(output, questions)
             if Inpt.get_input() == "":
                 Stop = True
@@ -125,6 +127,8 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
             if invalidRequest(request) == True or len(request) == 0:
                 Stop = True
                 break
+        if rounds >= 4:
+            Stop = True
 
         rounds = 0
         while Stop == False:
