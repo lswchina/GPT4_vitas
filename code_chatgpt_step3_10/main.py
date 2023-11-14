@@ -6,7 +6,9 @@ from model.FSM import FSM
 import util.deal_with_UI as UI
 from util.Spider import Spider
 from util.ChatGPT import askChatGPT
+from util.Llama import askLlama
 import util.Constant as Constant
+import util.Azure as Azure
 from skill.Skill import Skill
 import step2_test_skill as test
 
@@ -18,6 +20,7 @@ def getArgs():
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark2022.xlsx")
     parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gpt4_vitas_10min/")
     parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/gpt4_vitas/result/")
+    parser.add_argument("-m", help = "input the LLM", dest = "llm", type = str, default = "Llama2")
     args = parser.parse_args()
     EXCEL_PATH = "../dataset_2022/" + args.excel_name
     LOG_PATH = args.log_path
@@ -26,7 +29,8 @@ def getArgs():
     RESULT_PATH = args.res_path
     if RESULT_PATH[-1] != '/':
         RESULT_PATH = RESULT_PATH + '/'
-    return EXCEL_PATH, LOG_PATH, RESULT_PATH
+    LLM = args.llm
+    return EXCEL_PATH, LOG_PATH, RESULT_PATH, LLM
 
 def init_dir(LOG_PATH, RESULT_PATH):
     if not os.path.exists(RESULT_PATH):
@@ -67,7 +71,7 @@ def init_constant():
     Constant.CONTEXT_RELATED_LABEL = "context-related"
 
 if __name__ == '__main__':
-    EXCEL_PATH, LOG_PATH, RESULT_PATH = getArgs()
+    EXCEL_PATH, LOG_PATH, RESULT_PATH, LLM = getArgs()
     if not os.path.exists(EXCEL_PATH):
         print("the excel path does not exist")
         sys.exit()
@@ -75,21 +79,30 @@ if __name__ == '__main__':
     init_dir(LOG_PATH, RESULT_PATH)
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
-    index_list = [3, 6]
-    for index in index_list:
-    # while True:
-        # if index > 6:
-        #     break
+    if LLM == "Llama2":
+        registry_ml_client = Azure.set_up_pre()
+    else:
+        registry_ml_client = None
+    index = 1
+    while True:
         skill = Skill(EXCEL_PATH, index)
-        if skill.skillName == '<end_of_excel>':
+        if skill.skillName == '<end_of_excel>' or index > 100:
             break
         if skill.skillName != '':
             skill_log_path = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.skillName))
             if not os.path.exists(skill_log_path):
                 os.makedirs(skill_log_path)
-            gpt = askChatGPT(skill.skillName, skill_log_path, True)
+            else:
+                index = index + 1
+                continue
+            if LLM == "Llama2":
+                gpt = askLlama(skill.skillName, skill_log_path, True, registry_ml_client)
+            else:
+                gpt = askChatGPT(skill.skillName, skill_log_path, True)
             fsm = FSM(gpt)
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)
-        # index = index + 1
+        index = index + 1
+    if LLM == "Llama2":
+        Azure.delete(registry_ml_client)
     UI.close_spider(spider)
