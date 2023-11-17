@@ -20,9 +20,9 @@ import util.Constant as Constant
 class Spider:
     def __init__(self, config_path):
         chrome_options = Options()
-        '''chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
-        chrome_options.add_argument('--headless')'''
+        chrome_options.add_argument('--headless')
         s = Service(executable_path=Constant.CHROME_PATH)
         self.web_driver = webdriver.Chrome(options= chrome_options, service=s)
         cf = configparser.ConfigParser()
