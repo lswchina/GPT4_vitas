@@ -165,6 +165,7 @@ class askChatGPT:
                 promptBody2 = promptBody2 + "responses to " + state + "."
         self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
+            openai.api_key = os.getenv("OPENAI_API_KEY")
             messageBody.append({"role": "user", "content": promptBody2})
             responses2 = ''
             for i in range(3):
@@ -380,6 +381,7 @@ class askChatGPT:
             promptBody2 = promptBody2 + "Please choose another input event from the input event list " + str(candidate_input_list) + "."
         self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
+            openai.api_key = os.getenv("OPENAI_API_KEY")
             messageBody.append({"role": "user", "content": promptBody2})
             response2 = ''
             for i in range(3):
