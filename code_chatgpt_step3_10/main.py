@@ -91,7 +91,7 @@ if __name__ == '__main__':
         registry_ml_client = Azure.set_up_pre()
     else:
         registry_ml_client = None
-    index = 34
+    index = 86
     while True:
         skill = Skill(EXCEL_PATH, index)
         if skill.skillName == '<end_of_excel>' or index > 100:
