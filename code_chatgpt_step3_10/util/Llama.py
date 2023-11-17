@@ -1,7 +1,7 @@
 import os
 import random
 from copy import deepcopy
-import code_chatgpt_step3_10.util.Azure as Azure
+import util.Azure as Azure
 
 os.environ["http_proxy"] = "http://127.0.0.1:7890"
 os.environ["https_proxy"] = "http://127.0.0.1:7890"
