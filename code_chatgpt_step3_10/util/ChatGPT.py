@@ -319,29 +319,32 @@ class askChatGPT:
         self.__messageBody3.append({"role": "assistant", "content": response})
         select_input = ''
         inQuoteWords = []
-        response = response.split("Output: ")[1]
-        response_split = response.split("\"")
-        if len(response_split) == 2:
-            inQuoteWords.append(response)
-        else:
-            for i, word in enumerate(response_split):
-                if i % 2 == 1:
-                    inQuoteWords.append(word)
-                else:
-                    temp_split = word.split("'")
-                    if len(temp_split) >= 3:
-                        for j, word_ in enumerate(temp_split):
-                            if j % 2 == 1:
-                                inQuoteWords.append(word_)
-                    elif len(response_split) == 1:
+        if "Output: " in response:
+            response = response.split("Output: ")[1]
+            response_split = response.split("\"")
+            if len(response_split) == 2:
+                inQuoteWords.append(response)
+            else:
+                for i, word in enumerate(response_split):
+                    if i % 2 == 1:
                         inQuoteWords.append(word)
-        for input_ in candidate_input_list:
-            for word in inQuoteWords:
-                if input_ == word.lower():
-                    select_input = input_
+                    else:
+                        temp_split = word.split("'")
+                        if len(temp_split) >= 3:
+                            for j, word_ in enumerate(temp_split):
+                                if j % 2 == 1:
+                                    inQuoteWords.append(word_)
+                        elif len(response_split) == 1:
+                            inQuoteWords.append(word)
+            for input_ in candidate_input_list:
+                for word in inQuoteWords:
+                    if input_ == word.lower():
+                        select_input = input_
+                        break
+                if select_input != '':
                     break
-            if select_input != '':
-                break
+        else:
+            response = ""
         if select_input == '':
             select_input = self.step3_prompt2(response, [], candidate_input_list, self.__messageBody3)
         else:
@@ -432,7 +435,10 @@ class askChatGPT:
             promptBody2 = "Choosing an input event from " + str(better_inputs) + " might be better than the input event \"" + inpt + "\"."
             promptBody2 = promptBody2 + "Please choose another input event from the input event list " + str(better_inputs) + "."
         elif len(candidate_input_list) != 0:
-            promptBody2 = '"' + inpt + "\" is not in the given input event list: " + str(candidate_input_list) + ". "
+            if inpt != "":
+                promptBody2 = '"' + inpt + "\" is not in the given input event list: " + str(candidate_input_list) + ". "
+            else:
+                promptBody2 = "No input is given. "
             promptBody2 = promptBody2 + "Please choose another input event from the input event list " + str(candidate_input_list) + "."
         self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
