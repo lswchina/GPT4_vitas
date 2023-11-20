@@ -33,7 +33,7 @@ def ansAlexa(output, questions):
     for key in Answers:
         return Input(-1, key)
     print("Without answer?")
-    return Input(-1, "")
+    return Input(-1, "", 0)
     
 def ansSkill(index, output, fsm, rounds, request, lastQuestion, Inpt, time_before_testing):
     questions = []
