@@ -20,8 +20,8 @@ import os
 # FILE_PATH1 = os.path.join(PATH, "step1_findState.txt") #"step1_findState(in-context).txt")
 # FILE_PATH2 = os.path.join(PATH, "step2_genInputs.txt") #"step2_genInputs(in-context).txt")
 # FILE_PATH3 = os.path.join(PATH, "step3_selectInput.txt") # "step3_selectInput(in-context+cot).txt"
-SUBSCRIPTION_ID="70210d86-6643-4dc3-baa4-27110e157597"
-RESOURCE_GROUP_NAME="Gavin"
+SUBSCRIPTION_ID="x"
+RESOURCE_GROUP_NAME="x"
 WORKSPACE_NAME="Llama2-7b"
 REGISTRY = "azureml-meta" #"azureml"
 MODEL_NAME = "Llama-2-13b" #"gpt2"
