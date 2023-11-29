@@ -18,9 +18,10 @@ def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="2")
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark2022.xlsx")
-    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gpt4_10min/")
-    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/gpt4_10min/result/")
+    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/llama2_10min/")
+    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/llama2_10min/result/")
     parser.add_argument("-m", help = "input the LLM", dest = "llm", type = str, default = "Llama2")
+    parser.add_argument("-lp", help = "input the path of Llama2", dest = "llmpath", type = str)
     args = parser.parse_args()
     CONFIG_ID = args.id
     EXCEL_PATH = "../dataset_2022/" + args.excel_name
@@ -31,7 +32,8 @@ def getArgs():
     if RESULT_PATH[-1] != '/':
         RESULT_PATH = RESULT_PATH + '/'
     LLM = args.llm
-    return CONFIG_ID, EXCEL_PATH, LOG_PATH, RESULT_PATH, LLM
+    LLM_PATH = args.llmpath
+    return CONFIG_ID, EXCEL_PATH, LOG_PATH, RESULT_PATH, LLM, LLM_PATH
 
 def init_dir(LOG_PATH, RESULT_PATH):
     if not os.path.exists(RESULT_PATH):
@@ -78,7 +80,7 @@ def init_constant(config_id):
     Constant.CONTEXT_RELATED_LABEL = "context-related"
 
 if __name__ == '__main__':
-    CONFIG_ID, EXCEL_PATH, LOG_PATH, RESULT_PATH, LLM = getArgs()
+    CONFIG_ID, EXCEL_PATH, LOG_PATH, RESULT_PATH, LLM, LLM_PATH = getArgs()
     if not os.path.exists(EXCEL_PATH):
         print("the excel path does not exist")
         sys.exit()
@@ -87,7 +89,7 @@ if __name__ == '__main__':
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
     if LLM == "Llama2":
-        model, tokenizer = hug.load_model()
+        model, tokenizer = hug.load_model(LLM_PATH)
     else:
         model = None
         tokenizer = None

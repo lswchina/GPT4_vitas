@@ -6,9 +6,9 @@ import gc
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:1024"
 
-def load_model():
-    model_path = os.path.join(os.path.abspath('.'), "Llama-2-13b-hf")
+def load_model(model_path):
     if not os.path.exists(model_path):
+        os.mkdir(model_path)
         # before downloading the Llama-2-13b
         model_16bit = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-2-13b-hf", torch_dtype=torch.float16)
         tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-2-13b-hf")
