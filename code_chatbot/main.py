@@ -93,7 +93,7 @@ if __name__ == '__main__':
     else:
         model = None
         tokenizer = None
-    index = 86
+    index = 1
     while True:
         skill = Skill(EXCEL_PATH, index)
         if skill.skillName == '<end_of_excel>' or index > 100:
