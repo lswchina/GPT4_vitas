@@ -17,9 +17,9 @@ def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="5")
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark2022.xlsx")
-    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gpt4_vitas_3_10min/")
-    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/gpt4_vitas_3_10min/result/")
-    parser.add_argument("-g", help = "input the path to save logs of GPT4_vitas", dest = "log_path_gpt", type = str, default = "../../output/gpt4_vitas_10min/")
+    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gavin12+vitas3_10min/")
+    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/gavin12+vitas3_10min/result/")
+    parser.add_argument("-g", help = "input the path to save logs of GPT4_vitas", dest = "log_path_gpt", type = str, default = "../../output/gavin_10min/")
     args = parser.parse_args()
     CONFIG_ID = args.id
     EXCEL_PATH = "../dataset_2022/" + args.excel_name
