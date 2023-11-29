@@ -74,7 +74,7 @@ class Spider:
         time.sleep(2)
         self.web_driver.find_element(By.ID, 'ap_email').send_keys(self.username)
         self.web_driver.find_element(By.ID, 'ap_email').send_keys(Keys.ENTER)
-        time.sleep(2)
+        time.sleep(10)
         self.web_driver.find_element(By.ID, 'ap_password').send_keys(self.password)
         self.web_driver.find_element(By.ID, 'ap_password').send_keys(Keys.ENTER)
         time.sleep(5)
