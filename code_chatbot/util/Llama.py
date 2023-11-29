@@ -1,20 +1,22 @@
+from lib2to3.pgen2.token import tok_name
 import os
 import random
 from copy import deepcopy
-import util.Azure as Azure
+import util.Huggingface as hug
 
 os.environ["http_proxy"] = "http://127.0.0.1:7890"
 os.environ["https_proxy"] = "http://127.0.0.1:7890"
 
 class askLlama:
-    def __init__(self, skillName, useAPI, registry_ml_client):
+    def __init__(self, skillName, useAPI, model, tokenizer):
         self.skillName = skillName
-        self.__client = registry_ml_client
+        self.__model = model
+        self.__tokenizer = tokenizer
         self.__useAPI = useAPI
 
     def test(self, prompt):
         if self.__useAPI == True:
-            ans = Azure.test(prompt, self.__client).split("\n")[0]
+            ans = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
         else:
             print("VPA app:\n" + prompt + "\n")
             ans = input("Llama-2-13b:\n")

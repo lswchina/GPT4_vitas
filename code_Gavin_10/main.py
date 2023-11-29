@@ -1,3 +1,5 @@
+from lib2to3.pgen2 import token
+from lib2to3.pgen2.token import tok_name
 import os
 import re
 import sys
@@ -8,7 +10,7 @@ from util.Spider import Spider
 from util.ChatGPT import askChatGPT
 from util.Llama import askLlama
 import util.Constant as Constant
-import util.Azure as Azure
+import util.Huggingface as hug
 from skill.Skill import Skill
 import step2_test_skill as test
 
@@ -21,7 +23,7 @@ def getArgs():
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark2022.xlsx")
     parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gavin_10min/")
     parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/gavin_10min/result/")
-    parser.add_argument("-m", help = "input the LLM", dest = "llm", type = str, default = "GPT4")
+    parser.add_argument("-m", help = "input the LLM", dest = "llm", type = str, default = "Llama2")
     args = parser.parse_args()
     CONFIG_ID = args.id
     EXCEL_PATH = "../dataset_2022/" + args.excel_name
@@ -88,9 +90,10 @@ if __name__ == '__main__':
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
     if LLM == "Llama2":
-        registry_ml_client = Azure.set_up_pre()
+        model, tokenizer = hug.load_model()
     else:
-        registry_ml_client = None
+        model = None
+        tokenizer = None
     index = 86
     while True:
         skill = Skill(EXCEL_PATH, index)
@@ -104,13 +107,11 @@ if __name__ == '__main__':
                 index = index + 1
                 continue
             if LLM == "Llama2":
-                gpt = askLlama(skill.skillName, skill_log_path, True, registry_ml_client)
+                gpt = askLlama(skill.skillName, skill_log_path, True, model, tokenizer)
             else:
                 gpt = askChatGPT(skill.skillName, skill_log_path, True)
             fsm = FSM(gpt)
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)
         index = index + 1
-    if LLM == "Llama2":
-        Azure.delete(registry_ml_client)
     UI.close_spider(spider)

@@ -1,13 +1,14 @@
+from lib2to3.pgen2 import token
 import os
 import random
 from copy import deepcopy
-import util.Azure as Azure
+import util.Huggingface as hug
 
 os.environ["http_proxy"] = "http://127.0.0.1:7890"
 os.environ["https_proxy"] = "http://127.0.0.1:7890"
 
 class askLlama:
-    def __init__(self, skillName, log_dir, __useAPI, registry_ml_client):
+    def __init__(self, skillName, log_dir, __useAPI, model, tokenizer):
         self.skillName = skillName
         if log_dir != "":
             self.__Step1_Recorder_Path = os.path.join(log_dir, "step1_findState.txt")
@@ -21,7 +22,8 @@ class askLlama:
         self.__promptGlobal1 = ""
         self.__promptGlobal2 = ""
         self.__promptGlobal3 = ""
-        self.__client = registry_ml_client
+        self.__model = model
+        self.__tokenizer = tokenizer
 
     def step1_chat(self, skill_output, state_list):
         hasGlobal1 = True
@@ -36,7 +38,7 @@ class askLlama:
         else:
             self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody + "\n")
         if self.__useAPI == True:
-            state = Azure.test(prompt, self.__client).split("\n")[0]
+            state = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
         else:
             if hasGlobal1 == False:
                 print("Step1_User:\n" + self.__promptGlobal1 + promptBody + "\n")
@@ -81,7 +83,7 @@ class askLlama:
             promptBody2 = "The state \"" + errorMessage + "\" and sentence " + skill_output + " are semantically similar."
         self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
-            state2 = Azure.test(promptBody2, self.__client).split("\n")[0]
+            state2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("\n")[0]
         else:
             print("Step1_User_2:\n" + promptBody2)
             state2 = input("Step1_Llama-2-13b_2:\n")
@@ -107,7 +109,7 @@ class askLlama:
         else:
             self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody + "\n")
         if self.__useAPI == True:
-            gpt_response = Azure.test(prompt, self.__client).split("\n")[0]
+            gpt_response = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
         else:
             if hasGlobal2 == False:
                 print("Step2_User:\n" + self.__promptGlobal2 + promptBody + "\n")
@@ -152,7 +154,7 @@ class askLlama:
                 promptBody2 = promptBody2 + "responses to " + state + "."
         self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
-            responses2 = Azure.test(promptBody2, self.__client).split("\n")[0]
+            responses2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("\n")[0]
         else:
             print("Step2_User_2:\n" + promptBody2 + "\n")
             responses2 = input("Step2_Llama-2-13b_2:\n")
@@ -205,7 +207,7 @@ class askLlama:
         else:
             self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody + "\n")
         if self.__useAPI == True:
-            responses = Azure.test(prompt, self.__client).split("Output: ")
+            responses = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("Output: ")
             response = responses[0] + "Output: " + responses[1].split("\n")[0]
         else:
             if hasGlobal3 == False:
@@ -258,42 +260,46 @@ class askLlama:
                 time_of_select_input = Inpt.get_times()
                 type_of_selec_input = Inpt.get_type()
                 if type_of_selec_input == 0:
-                    type_id_of_select_input = 0
+                    type_id_of_select_input = 1
                 else:
                     type_id_of_select_input = 2
                 break
-        better_Inpt = []
-        contain_low_times_crt = False
+        better_inputs = []
+        type_1_list = []
+        type_2_list = []
         for Inpt in candidate_Inpt_list:
-            times = Inpt.get_times()
             type_ = Inpt.get_type()
+            input_ = Inpt.get_input()
             if type_ == 0:
-                type_id = 0
+                type_1_list.append(Inpt)
             else:
-                type_id = 2
-            if type_id == 2 and times < 2:
-                contain_low_times_crt = True
-            input_weight = candidate_input_set_to_weight[Inpt.get_input()]
-            if input_weight > weight_of_select_input:
-                better_Inpt.append(Inpt)
-            elif input_weight == weight_of_select_input:
-                if type_id > type_id_of_select_input:
-                    if times < 2:
-                        better_Inpt.append(Inpt)
-        if len(better_Inpt) == 0 and type_id_of_select_input == 2 and contain_low_times_crt == False:
-            better_inputs = ['help', 'pause', 'resume', 'stop', 'what\'s the time']
-        elif len(better_Inpt) != 0:
-            better_inputs_temp = []
-            for Inpt in better_Inpt:
-                times = Inpt.get_times()
-                type_ = Inpt.get_type()
-                input_ = Inpt.get_input()
-                if type_ != 0 and times < 2:
-                    better_inputs.append(input_)
-                elif type_ == 0:
-                    better_inputs_temp.append(input_)
-            if len(better_inputs) == 0 and len(better_inputs_temp) != 0:
-                better_inputs = better_inputs_temp
+                type_2_list.append(Inpt)
+            if weight_of_select_input == 0 and candidate_input_set_to_weight[input_] == 4:
+                better_inputs.append(input_)
+        if len(better_inputs) > 0:
+            return better_inputs
+        if type_id_of_select_input == 2:
+            for type_2_Inpt in type_2_list:
+                type_2_input = type_2_Inpt.get_input()
+                if type_2_Inpt.get_times() < time_of_select_input and candidate_input_set_to_weight[type_2_input] == 4:
+                    better_inputs.append(type_2_input)
+            if len(better_inputs) > 0:
+                return better_inputs
+            if time_of_select_input >= 3:
+                for type_1_Inpt in type_1_list:
+                    type_1_input = type_1_Inpt.get_input()
+                    better_inputs.append(type_1_input)
+        else:
+            for type_2_Inpt in type_2_list:
+                type_2_input = type_2_Inpt.get_input()
+                if type_2_Inpt.get_times() < 3 and candidate_input_set_to_weight[type_2_input] == 4:
+                    better_inputs.append(type_2_input)
+            if len(better_inputs) > 0:
+                return better_inputs
+            for type_1_Inpt in type_1_list:
+                type_1_input = type_1_Inpt.get_input()
+                if type_1_Inpt.get_times() < time_of_select_input and candidate_input_set_to_weight[type_1_input] == 4:
+                    better_inputs.append(type_1_input)
         return better_inputs
 
     def __getPromptGlobal3(self):
@@ -332,7 +338,7 @@ class askLlama:
             promptBody2 = promptBody2 + "Please choose another input event from the input event list " + str(candidate_input_list) + "."
         self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
-            responses2 = Azure.test(promptBody2, self.__client).split("Output: ")
+            responses2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("Output: ")
             response2 = responses2[0] + "Output: "
             if len(responses2) > 1:
                 response2 += responses2[1].split("\n")[0]
@@ -398,12 +404,10 @@ class askLlama:
                 continue
             next_state = transitions[input]
             if next_state == state:
-                candidate_input_set_to_weight[input] -= 2
+                candidate_input_set_to_weight[input] = 0
             next_state_info = states[next_state]
             if next_state_info[0] == True:
-                candidate_input_set_to_weight[input] -= 2
-            elif next_state_info[1] < state_info[1]:
-                candidate_input_set_to_weight[input] -= 1
+                candidate_input_set_to_weight[input] = 0
         return prompt, candidate_input_set_to_weight
 
     def __gen_prompt_for_step3_nl(self, states, state, transitions, candidate_input_set, candidate_input_list):
