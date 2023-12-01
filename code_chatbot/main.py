@@ -108,7 +108,7 @@ if __name__ == '__main__':
             if LLM == "Llama2":
                 gpt = askLlama(skill.skillName, True, model, tokenizer)
             else:
-                gpt = askChatGPT(skill.skillName, True)
+                gpt = askChatGPT(skill.skillName, True, Constant.CONFIG_PATH)
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt)
             UI.re_open_with_no_exit(spider)
         index = index + 1

@@ -1,4 +1,5 @@
 import os
+import configparser
 import openai
 import random
 
@@ -6,7 +7,7 @@ os.environ["http_proxy"] = "http://127.0.0.1:7890"
 os.environ["https_proxy"] = "http://127.0.0.1:7890"
 
 class askChatGPT:
-    def __init__(self, skillName, log_dir, log_dir_gpt, __useAPI):
+    def __init__(self, skillName, log_dir, log_dir_gpt, useAPI, config_path):
         self.skillName = skillName
         if log_dir != "":
             self.__Step2_Recorder_Path = os.path.join(log_dir, "step2_genInputs.txt")
@@ -23,7 +24,7 @@ class askChatGPT:
             self.__answerDict3 = self.__getAnswerDict(3, Step3_Recorder_Path_gpt)
             print(self.__answerDict2)
             print(self.__answerDict3)
-        self.__useAPI = __useAPI
+        self.__useAPI = useAPI
         self.__promptGlobal2 = ""
         self.__promptGlobal3 = ""
         self.__messageBody2 = [
@@ -32,6 +33,12 @@ class askChatGPT:
         self.__messageBody3 = [
             {"role": "system", "content": "Choose one input from the input event list to cover more future states."}
         ]
+        cf = configparser.ConfigParser()
+        cf.read(config_path)
+        openai.api_type = "azure"
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        openai.api_base = cf.get('Azure', 'apibase')
+        openai.api_version = cf.get('Azure', 'apiversion')
 
     def __getAnswerDict(self, type, log_path):
         answerDict = {}
@@ -70,7 +77,6 @@ class askChatGPT:
         return answerDict
 
     def step2_chat(self, Ques):
-        openai.api_key = os.getenv("OPENAI_API_KEY")
         hasGlobal2 = True
         if self.__promptGlobal2 == "":
             hasGlobal2 = False
@@ -165,7 +171,6 @@ class askChatGPT:
                 promptBody2 = promptBody2 + "responses to " + state + "."
         self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
-            openai.api_key = os.getenv("OPENAI_API_KEY")
             messageBody.append({"role": "user", "content": promptBody2})
             responses2 = ''
             for i in range(3):
@@ -220,7 +225,6 @@ class askChatGPT:
 
     def step3_chat(self, states, state, transitions, candidate_Inpt_list):
         candidate_input_list = [i.get_input() for i in candidate_Inpt_list]
-        openai.api_key = os.getenv("OPENAI_API_KEY")
         hasGlobal3 = True
         if self.__promptGlobal3 == "":
             hasGlobal3 = False
@@ -391,7 +395,6 @@ class askChatGPT:
             promptBody2 = promptBody2 + "Please choose another input event from the input event list " + str(candidate_input_list) + "."
         self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
-            openai.api_key = os.getenv("OPENAI_API_KEY")
             messageBody.append({"role": "user", "content": promptBody2})
             response2 = ''
             for i in range(3):

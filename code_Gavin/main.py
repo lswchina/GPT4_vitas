@@ -95,7 +95,7 @@ if __name__ == '__main__':
             else:
                 index = index + 1
                 continue
-            gpt = askChatGPT(skill.skillName, skill_log_path, True)
+            gpt = askChatGPT(skill.skillName, skill_log_path, True, Constant.CONFIG_PATH)
             fsm = FSM(gpt)
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)

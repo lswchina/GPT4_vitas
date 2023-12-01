@@ -1,16 +1,22 @@
 import os
+import configparser
 import openai
 
 os.environ["http_proxy"] = "http://127.0.0.1:7890"
 os.environ["https_proxy"] = "http://127.0.0.1:7890"
 
 class askChatGPT:
-    def __init__(self, skillName, useAPI):
+    def __init__(self, skillName, useAPI, config_path):
         self.skillName = skillName
         self.__useAPI = useAPI
+        cf = configparser.ConfigParser()
+        cf.read(config_path)
+        openai.api_type = "azure"
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        openai.api_base = cf.get('Azure', 'apibase')
+        openai.api_version = cf.get('Azure', 'apiversion')
 
     def test(self, prompt):
-        openai.api_key = os.getenv("OPENAI_API_KEY")
         messageBody = [
             {"role": "system", "content": "You are a chatbot."}
         ]

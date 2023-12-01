@@ -103,7 +103,7 @@ if __name__ == '__main__':
             if not os.path.exists(skill_log_path_gpt):
                 print(skill_log_path_gpt, " does not exist")
             else:    
-                gpt = askChatGPT(skill.skillName, skill_log_path, skill_log_path_gpt, True)
+                gpt = askChatGPT(skill.skillName, skill_log_path, skill_log_path_gpt, True, Constant.CONFIG_PATH)
                 fsm = FSM(gpt)
                 test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
                 UI.re_open_with_no_exit(spider)
