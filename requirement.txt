@@ -1,5 +1,5 @@
 spacy
 selenium
-openai
+openai==0.28
 openpyxl
 np
