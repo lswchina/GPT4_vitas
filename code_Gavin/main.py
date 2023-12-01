@@ -14,7 +14,7 @@ def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", help = "input the begin index", dest = "index", type=int, default=2)
     parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="1")
-    parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "2022_us_1.xlsx")
+    parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "large_scale.xlsx")
     parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gavin/")
     args = parser.parse_args()
     INDEX = args.index
