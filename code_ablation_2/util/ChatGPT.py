@@ -3,9 +3,6 @@ import configparser
 import openai
 import random
 
-os.environ["http_proxy"] = "http://127.0.0.1:7890"
-os.environ["https_proxy"] = "http://127.0.0.1:7890"
-
 class askChatGPT:
     def __init__(self, skillName, log_dir, log_dir_gpt, useAPI, config_path):
         self.skillName = skillName

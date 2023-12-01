@@ -11,9 +11,6 @@ import util.Huggingface as hug
 from skill.Skill import Skill
 import step2_test_skill as test
 
-# os.environ["http_proxy"] = "http://127.0.0.1:7890"
-# os.environ["https_proxy"] = "http://127.0.0.1:7890"
-
 def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="2")
