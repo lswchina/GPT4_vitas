@@ -79,7 +79,6 @@ def init_constant(config_id):
 
 if __name__ == '__main__':
     CONFIG_ID, EXCEL_PATH, LOG_PATH, RESULT_PATH, LLM, LLM_PATH = getArgs()
-    print("here")
     if not os.path.exists(EXCEL_PATH):
         print("the excel path does not exist")
         sys.exit()
@@ -92,7 +91,7 @@ if __name__ == '__main__':
     else:
         model = None
         tokenizer = None
-    index = 1
+    index = 92
     while True:
         skill = Skill(EXCEL_PATH, index)
         if skill.skillName == '<end_of_excel>' or index > 100:
