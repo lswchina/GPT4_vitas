@@ -1,5 +1,3 @@
-from lib2to3.pgen2 import token
-from lib2to3.pgen2.token import tok_name
 import os
 import re
 import sys
@@ -81,6 +79,7 @@ def init_constant(config_id):
 
 if __name__ == '__main__':
     CONFIG_ID, EXCEL_PATH, LOG_PATH, RESULT_PATH, LLM, LLM_PATH = getArgs()
+    print("here")
     if not os.path.exists(EXCEL_PATH):
         print("the excel path does not exist")
         sys.exit()
