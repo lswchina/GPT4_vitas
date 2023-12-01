@@ -1,9 +1,7 @@
-from re import S
 import np
 import time
 from random import sample
 from util.NLP import NLP
-from model.Input import Input
 from model.Question import Question
 
 class getAns:
