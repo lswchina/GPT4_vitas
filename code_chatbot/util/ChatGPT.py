@@ -24,7 +24,7 @@ class askChatGPT:
                 # self.update_duration_list()
                 try:
                     responseBody = openai.ChatCompletion.create(
-                        model = "gpt-4",
+                        engine="Gavin_deployment",
                         messages = messageBody,
                         temperature = 0,
                         max_tokens = 450

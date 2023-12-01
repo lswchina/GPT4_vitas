@@ -96,7 +96,7 @@ class askChatGPT:
                     # self.update_duration_list()
                     try:
                         responseBody = openai.ChatCompletion.create(
-                            model = "gpt-4",
+                            engine="Gavin_deployment",
                             messages = self.__messageBody2,
                             temperature = 0,
                             max_tokens = 300
@@ -174,7 +174,7 @@ class askChatGPT:
                 # self.update_duration_list()
                 try:
                     responseBody = openai.ChatCompletion.create(
-                        model = "gpt-4",
+                        engine="Gavin_deployment",
                         messages = messageBody,
                         temperature = 0,
                         max_tokens = 350
@@ -243,7 +243,7 @@ class askChatGPT:
                     # self.update_duration_list()
                     try:
                         responseBody = openai.ChatCompletion.create(
-                            model = "gpt-4",
+                            engine="Gavin_deployment",
                             messages = self.__messageBody3,
                             temperature = 0,
                             max_tokens = 400
@@ -398,7 +398,7 @@ class askChatGPT:
                 # self.update_duration_list()
                 try:
                     responseBody = openai.ChatCompletion.create(
-                        model = "gpt-4",
+                        engine="Gavin_deployment",
                         messages = messageBody,
                         temperature = 0,
                         max_tokens = 450
