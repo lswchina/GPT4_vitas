@@ -4,9 +4,6 @@ import random
 from copy import deepcopy
 import util.Huggingface as hug
 
-os.environ["http_proxy"] = "http://127.0.0.1:7890"
-os.environ["https_proxy"] = "http://127.0.0.1:7890"
-
 class askLlama:
     def __init__(self, skillName, log_dir, __useAPI, model, tokenizer):
         self.skillName = skillName
