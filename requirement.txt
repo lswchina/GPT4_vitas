@@ -1,0 +1,5 @@
+spacy
+selenium
+openai
+openpyxl
+np
