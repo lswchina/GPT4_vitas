@@ -84,7 +84,7 @@ if __name__ == '__main__':
     init_dir(LOG_PATH, RESULT_PATH)
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
-    index = 1
+    index = 92
     while True:
         skill = Skill(EXCEL_PATH, index)
         if skill.skillName == '<end_of_excel>' or index > 100:
