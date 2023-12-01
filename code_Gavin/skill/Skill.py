@@ -74,7 +74,7 @@ class Skill:
         else:
             return
         self.skillName = skillAttri[1].value
-        self.type = skillAttri[2].value
+        self.type = skillAttri[9].value
         self.__description_sents = NLP.splitSentence(skillAttri[15].value)
         try:
             invocation_name = dict(eval(skillAttri[12].value)).get('en-US')
