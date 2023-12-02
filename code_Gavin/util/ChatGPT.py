@@ -28,14 +28,15 @@ class askChatGPT:
         self.__messageBody3 = [
             {"role": "system", "content": "Choose one input from the input event list to cover more future states."}
         ]
+        self.__config_path = config_path
+
+    def step1_chat(self, skill_output, state_list):
         cf = configparser.ConfigParser()
-        cf.read(config_path)
+        cf.read(self.__config_path)
         openai.api_type = "azure"
         openai.api_key = os.getenv("OPENAI_API_KEY")
         openai.api_base = cf.get('Azure', 'apibase')
         openai.api_version = cf.get('Azure', 'apiversion')
-
-    def step1_chat(self, skill_output, state_list):
         hasGlobal1 = True
         if self.__promptGlobal1 == "":
             hasGlobal1 = False
@@ -56,7 +57,7 @@ class askChatGPT:
                     responseBody = openai.ChatCompletion.create(
                         engine="Gavin_deployment",
                         messages = self.__messageBody1,
-                        temperature = 0,
+                        temperature = 0.1,
                         max_tokens = 200
                     )
                     state = str(responseBody['choices'][0]['message']['content'])
@@ -101,6 +102,12 @@ class askChatGPT:
         return self.__promptGlobal1
 
     def step1_prompt2(self, state, skill_output, state_list, errorMessage, messageBody):
+        cf = configparser.ConfigParser()
+        cf.read(self.__config_path)
+        openai.api_type = "azure"
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        openai.api_base = cf.get('Azure', 'apibase')
+        openai.api_version = cf.get('Azure', 'apiversion')
         if errorMessage == 'not_exist':
             promptBody2 = "The \"" + state + "\" is not in the state list " + str(state_list) + ". "
             promptBody2 = promptBody2 + "Find a semantically similar state from the state list " + str(state_list) + " for the response \"" + skill_output + "\"."
@@ -137,6 +144,12 @@ class askChatGPT:
         return state2
 
     def step2_chat(self, Ques):
+        cf = configparser.ConfigParser()
+        cf.read(self.__config_path)
+        openai.api_type = "azure"
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        openai.api_base = cf.get('Azure', 'apibase')
+        openai.api_version = cf.get('Azure', 'apiversion')
         hasGlobal2 = True
         if self.__promptGlobal2 == "":
             hasGlobal2 = False
@@ -180,7 +193,13 @@ class askChatGPT:
         index2 = gpt_response.find("]", index1)
         if index1 != -1 and index2 != -1:
             gpt_response = gpt_response[index1: index2 + 1]
-            response_list = list(eval(gpt_response))
+            try:
+                response_list = list(eval(gpt_response))
+            except:
+                index2 = gpt_response.find("]", index2)
+                if index2 != -1:
+                    gpt_response = gpt_response[index1: index2 + 1]
+                    response_list = list(eval(gpt_response))
             if len(response_list) == 1 and response_list[0] == "":
                 response_list = []
         else:
@@ -192,6 +211,12 @@ class askChatGPT:
         return response_list
             
     def step2_prompt2(self, inpt, Ques, context_related_inputs, type, state, nouns):
+        cf = configparser.ConfigParser()
+        cf.read(self.__config_path)
+        openai.api_type = "azure"
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        openai.api_base = cf.get('Azure', 'apibase')
+        openai.api_version = cf.get('Azure', 'apiversion')
         skill_output = Ques.get_ques()
         if inpt == '':
             messageBody = self.step2_lastPrompt
@@ -248,7 +273,13 @@ class askChatGPT:
         index2 = responses2.find("]", index1)
         if index1 != -1 and index2 != -1 and index2 > index1 + 1:
             responses2 = responses2[index1: index2 + 1]
-            responses2_list = list(eval(responses2))
+            try:
+                responses2_list = list(eval(responses2))
+            except:
+                index2 = responses2.find("]", index2)
+                if index2 != -1:
+                    responses2 = responses2[index1: index2 + 1]
+                    responses2_list = list(eval(responses2))
             if len(responses2_list) > 3 and (Ques.get_quesType() == 3 or Ques.get_quesType() == -1):
                 responses2_list = self.__remove_low_certain(responses2_list)
             return responses2_list
@@ -278,6 +309,12 @@ class askChatGPT:
         return response_list
 
     def step3_chat(self, states, state, transitions, candidate_Inpt_list):
+        cf = configparser.ConfigParser()
+        cf.read(self.__config_path)
+        openai.api_type = "azure"
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        openai.api_base = cf.get('Azure', 'apibase')
+        openai.api_version = cf.get('Azure', 'apiversion')
         candidate_input_list = [i.get_input() for i in candidate_Inpt_list]
         skill_state_info, candidate_input_set_to_weight = self.__gen_prompt_for_step3(states, state, transitions, candidate_Inpt_list, candidate_input_list)
         hasGlobal3 = True
@@ -434,6 +471,12 @@ class askChatGPT:
         return self.__promptGlobal3
 
     def step3_prompt2(self, inpt, better_inputs, candidate_input_list, messageBody):
+        cf = configparser.ConfigParser()
+        cf.read(self.__config_path)
+        openai.api_type = "azure"
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        openai.api_base = cf.get('Azure', 'apibase')
+        openai.api_version = cf.get('Azure', 'apiversion')
         if len(better_inputs) != 0:
             promptBody2 = "Choosing an input event from " + str(better_inputs) + " might be better than the input event \"" + inpt + "\"."
             promptBody2 = promptBody2 + "Please choose another input event from the input event list " + str(better_inputs) + "."
