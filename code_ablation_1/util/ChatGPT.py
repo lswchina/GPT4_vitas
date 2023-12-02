@@ -123,7 +123,13 @@ class askChatGPT:
         index2 = gpt_response.find("]", index1)
         if index1 != -1 and index2 != -1:
             gpt_response = gpt_response[index1: index2 + 1]
-            response_list = list(eval(gpt_response))
+            try:
+                response_list = list(eval(gpt_response))
+            except:
+                index2 = gpt_response.find("]", index2)
+                if index2 != -1:
+                    gpt_response = gpt_response[index1: index2 + 1]
+                    response_list = list(eval(gpt_response))
             if len(response_list) == 1 and response_list[0] == "":
                 response_list = []
         else:
@@ -191,7 +197,13 @@ class askChatGPT:
         index2 = responses2.find("]", index1)
         if index1 != -1 and index2 != -1 and index2 > index1 + 1:
             responses2 = responses2[index1: index2 + 1]
-            responses2_list = list(eval(responses2))
+            try:
+                responses2_list = list(eval(responses2))
+            except:
+                index2 = responses2.find("]", index2)
+                if index2 != -1:
+                    responses2 = responses2[index1: index2 + 1]
+                    responses2_list = list(eval(responses2))
             if len(responses2_list) > 3 and (Ques.get_quesType() == 3 or Ques.get_quesType() == -1):
                 responses2_list = self.__remove_low_certain(responses2_list)
             return responses2_list
