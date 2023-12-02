@@ -1,4 +1,3 @@
-
 import os
 import re
 import sys
@@ -187,24 +186,30 @@ class Spider:
         except selenium.common.exceptions.WebDriverException:
             print("wait for getting the current url")
             time.sleep(60)
-        no_pass = False
-        no_email = False
-        while self.web_driver.current_url != self.url and (no_pass == False or no_email == False):
+        time_tmp = time.time()
+        while time.time() - time_tmp < 1*60 and self.web_driver.current_url != self.url:
             try:
                 email = self.web_driver.find_element(By.ID, 'ap_email')
                 email.send_keys(self.username)
                 time.sleep(1)
-                no_email = False
             except:
-                no_email = True
+                pass
             try:
                 passw = self.web_driver.find_element(By.ID, 'ap_password')
                 passw.send_keys(self.password)
                 passw.send_keys(Keys.ENTER)
-                time.sleep(15)
-                no_pass = False
+                time.sleep(1)
             except:
-                no_pass = True
+                pass
+            if self.web_driver.current_url.startswith("https://www.amazon.com/ap/cvf/transactionapproval"):
+                code = self.__get_link()
+                print(code)
+                if code != '':
+                    time.sleep(2)
+                    self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(code)
+                    self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(Keys.ENTER)
+                self.web_driver.get(self.url)
+                time.sleep(2)
         return
 
     def open_log_page(self):
@@ -236,7 +241,6 @@ class Spider:
         return textContent
 
     def __get_link(self):
-        """ 创建POP3对象，添加用户名和密码"""
         pop3Server = poplib.POP3(self.popserver)
         pop3Server.user(self.username)
         pop3Server.pass_(self.emailpass)
@@ -257,17 +261,21 @@ class Spider:
             for messagePart in messageParts:
                 bodyContent = self.__decodeBody(messagePart)
                 if bodyContent:
-                    link = re.findall(r'<a style="font-size: 12px; color: black; pointer-events: none; cursor: default; text-decoration: none; font-weight: 600">(.*?)</a>', str(bodyContent), re.S)
-                    if len(link) > 0:
+                    res1 = re.findall(r'''<td colspan="2" align="left" style="background-color: \#D3D3D3; text-align: left; font-size:20px; font-weight: bold; font-family: 'Amazon Ember', Arial, sans-serif; padding-top: 15px; padding-bottom: 10px; padding-left: 10px; padding-right: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">(.*?)</td>''', str(bodyContent), re.S)
+                    if len(res1) > 0:
+                        code = re.findall(r'''<p>(.*?)</p>''', res1[0], re.S)
+                    if len(code) > 0:
                         pop3Server.quit()
-                        return link[0].strip()
+                        return code[0].strip()
         else:
             bodyContent = self.__decodeBody(messageObject)
             if bodyContent:
-                link = re.findall(r'<a style="font-size: 12px; color: black; pointer-events: none; cursor: default; text-decoration: none; font-weight: 600">(.*?)</a>', str(bodyContent), re.S)
-                if len(link) > 0:
+                res1 = re.findall(r'''<td colspan="2" align="left" style="background-color: \#D3D3D3; text-align: left; font-size:20px; font-weight: bold; font-family: 'Amazon Ember', Arial, sans-serif; padding-top: 15px; padding-bottom: 10px; padding-left: 10px; padding-right: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">(.*?)</td>''', str(bodyContent), re.S)
+                if len(res1) > 0:
+                    code = re.findall(r'''<p>(.*?)</p>''', res1[0], re.S)
+                if len(code) > 0:
                     pop3Server.quit()
-                    return link[0].strip()
+                    return code[0].strip()
         pop3Server.quit()
         return ''
 
@@ -332,16 +340,19 @@ class Spider:
         time.sleep(2)
         self.web_driver.find_element(By.ID, 'ap_email').send_keys(self.username)
         self.web_driver.find_element(By.ID, 'ap_email').send_keys(Keys.ENTER)
-        time.sleep(2)
+        time.sleep(10)
         self.web_driver.find_element(By.ID, 'ap_password').send_keys(self.password)
         self.web_driver.find_element(By.ID, 'ap_password').send_keys(Keys.ENTER)
         time.sleep(5)
-        if self.web_driver.current_url != self.url:
-            time.sleep(80)
-            # link = self.get_link()
-            # print(link)
-            # if link != '':
-            #     self.approve(link)
+        if self.web_driver.current_url != "https://www.amazon.com/?ref_=nav_ya_signin":
+            time.sleep(20)
+            if self.web_driver.current_url.startswith("https://www.amazon.com/ap/cvf/transactionapproval"):
+                code = self.__get_link()
+                print(code)
+                if code != '':
+                    time.sleep(2)
+                    self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(code)
+                    self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(Keys.ENTER)
         self.__dump_cookie(Constant.COOKIE_DIR, self.web_driver)
 
     def __if_login(self, url):
