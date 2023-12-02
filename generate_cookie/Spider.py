@@ -18,7 +18,7 @@ from selenium.webdriver.chrome.service import Service
 class Spider:
     def __init__(self, config_path, cookie_dir, generateAll):
         chrome_options = Options()
-        s = Service(executable_path="../chrome/chromedriver_94")
+        s = Service(executable_path="../chrome/chromedriver_119.exe")
         self.web_driver = webdriver.Chrome(options= chrome_options, service=s)
         cf = configparser.ConfigParser()
         cf.read(config_path)
