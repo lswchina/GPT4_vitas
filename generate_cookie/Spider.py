@@ -30,7 +30,8 @@ class Spider:
         self.home_page = 'https://www.amazon.com/'
         if generateAll == True or not os.path.exists(cookie_dir):
             self.__generate_cookie(cookie_dir)
-        self.__get_link()
+        code = self.__get_link()
+        print(code)
         print("open amazon")
 
     def __dump_cookie(self, cookie_dir, webdriver):

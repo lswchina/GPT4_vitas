@@ -210,6 +210,9 @@ class Spider:
                     self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(Keys.ENTER)
                 else:
                     code = input("code:")
+                    self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(code)
+                    self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(Keys.ENTER)
+                    time.sleep(2)
                 self.web_driver.get(self.url)
                 time.sleep(2)
         return
