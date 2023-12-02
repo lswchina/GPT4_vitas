@@ -120,7 +120,7 @@ class askChatGPT:
         if len(self.__messageBody2) > 3:
             self.__messageBody2 = self.__messageBody2[:3]
         index1 = gpt_response.find("[")
-        index2 = gpt_response.rfind("]")
+        index2 = gpt_response.find("]", index1)
         if index1 != -1 and index2 != -1:
             gpt_response = gpt_response[index1: index2 + 1]
             response_list = list(eval(gpt_response))
@@ -188,7 +188,7 @@ class askChatGPT:
             responses2 = input("Step2_GPT4_2:\n")
         self.__record_result(self.__Step2_Recorder_Path, "GPT4:\n" + responses2 + "\n")
         index1 = responses2.find("[")
-        index2 = responses2.find("]")
+        index2 = responses2.find("]", index1)
         if index1 != -1 and index2 != -1 and index2 > index1 + 1:
             responses2 = responses2[index1: index2 + 1]
             responses2_list = list(eval(responses2))
