@@ -196,7 +196,7 @@ class askChatGPT:
             try:
                 response_list = list(eval(gpt_response))
             except:
-                index2 = gpt_response.find("]", index2)
+                index2 = gpt_response.find("]", index2 + 1)
                 if index2 != -1:
                     gpt_response = gpt_response[index1: index2 + 1]
                     response_list = list(eval(gpt_response))
@@ -276,7 +276,7 @@ class askChatGPT:
             try:
                 responses2_list = list(eval(responses2))
             except:
-                index2 = responses2.find("]", index2)
+                index2 = responses2.find("]", index2 + 1)
                 if index2 != -1:
                     responses2 = responses2[index1: index2 + 1]
                     responses2_list = list(eval(responses2))
