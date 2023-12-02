@@ -208,6 +208,8 @@ class Spider:
                     time.sleep(2)
                     self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(code)
                     self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(Keys.ENTER)
+                else:
+                    code = input("code:")
                 self.web_driver.get(self.url)
                 time.sleep(2)
         return
@@ -241,25 +243,35 @@ class Spider:
         return textContent
 
     def __get_link(self):
-        pop3Server = poplib.POP3(self.popserver)
-        pop3Server.user(self.username)
-        pop3Server.pass_(self.emailpass)
+        try:
+            pop3Server = poplib.POP3(self.popserver)
+            pop3Server.user(self.username)
+            pop3Server.pass_(self.emailpass)
 
-        messageCount, mailboxSize = pop3Server.stat()
-        """ 获取任意一封邮件的邮件对象【第一封邮件的编号为1，而不是0】"""
-        msgIndex = messageCount
-        # 获取第msgIndex封邮件的信息
-        response, msgLines, octets = pop3Server.retr(msgIndex)
-        # msgLines中为该邮件的每行数据,先将内容连接成字符串，再转化为email.message.Message对象
-        msgLinesToStr = b"\r\n".join(msgLines).decode("utf8", "ignore")
-        messageObject = Parser().parsestr(msgLinesToStr)
-        msgDate = messageObject["date"]
-        senderContent = messageObject["From"]
+            messageCount, mailboxSize = pop3Server.stat()
+            """ 获取任意一封邮件的邮件对象【第一封邮件的编号为1，而不是0】"""
+            msgIndex = messageCount
+            # 获取第msgIndex封邮件的信息
+            response, msgLines, octets = pop3Server.retr(msgIndex)
+            # msgLines中为该邮件的每行数据,先将内容连接成字符串，再转化为email.message.Message对象
+            msgLinesToStr = b"\r\n".join(msgLines).decode("utf8", "ignore")
+            messageObject = Parser().parsestr(msgLinesToStr)
+            msgDate = messageObject["date"]
+            senderContent = messageObject["From"]
 
-        if messageObject.is_multipart():  # 判断邮件是否由多个部分构成
-            messageParts = messageObject.get_payload()  # 获取邮件附载部分
-            for messagePart in messageParts:
-                bodyContent = self.__decodeBody(messagePart)
+            if messageObject.is_multipart():  # 判断邮件是否由多个部分构成
+                messageParts = messageObject.get_payload()  # 获取邮件附载部分
+                for messagePart in messageParts:
+                    bodyContent = self.__decodeBody(messagePart)
+                    if bodyContent:
+                        res1 = re.findall(r'''<td colspan="2" align="left" style="background-color: \#D3D3D3; text-align: left; font-size:20px; font-weight: bold; font-family: 'Amazon Ember', Arial, sans-serif; padding-top: 15px; padding-bottom: 10px; padding-left: 10px; padding-right: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">(.*?)</td>''', str(bodyContent), re.S)
+                        if len(res1) > 0:
+                            code = re.findall(r'''<p>(.*?)</p>''', res1[0], re.S)
+                        if len(code) > 0:
+                            pop3Server.quit()
+                            return code[0].strip()
+            else:
+                bodyContent = self.__decodeBody(messageObject)
                 if bodyContent:
                     res1 = re.findall(r'''<td colspan="2" align="left" style="background-color: \#D3D3D3; text-align: left; font-size:20px; font-weight: bold; font-family: 'Amazon Ember', Arial, sans-serif; padding-top: 15px; padding-bottom: 10px; padding-left: 10px; padding-right: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">(.*?)</td>''', str(bodyContent), re.S)
                     if len(res1) > 0:
@@ -267,17 +279,10 @@ class Spider:
                     if len(code) > 0:
                         pop3Server.quit()
                         return code[0].strip()
-        else:
-            bodyContent = self.__decodeBody(messageObject)
-            if bodyContent:
-                res1 = re.findall(r'''<td colspan="2" align="left" style="background-color: \#D3D3D3; text-align: left; font-size:20px; font-weight: bold; font-family: 'Amazon Ember', Arial, sans-serif; padding-top: 15px; padding-bottom: 10px; padding-left: 10px; padding-right: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">(.*?)</td>''', str(bodyContent), re.S)
-                if len(res1) > 0:
-                    code = re.findall(r'''<p>(.*?)</p>''', res1[0], re.S)
-                if len(code) > 0:
-                    pop3Server.quit()
-                    return code[0].strip()
-        pop3Server.quit()
-        return ''
+            pop3Server.quit()
+            return ''
+        except:
+            return ''
 
     def __approve(self, link):
         chrome_options = Options()
