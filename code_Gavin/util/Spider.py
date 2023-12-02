@@ -15,6 +15,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 import util.deal_with_UI as UI
 import util.Constant as Constant
+from distutils.version import StrictVersion
 
 
 class Spider:
@@ -23,8 +24,11 @@ class Spider:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--headless')
-        s = Service(executable_path=Constant.CHROME_PATH)
-        self.web_driver = webdriver.Chrome(options= chrome_options, service=s)
+        if StrictVersion(selenium.__version__) < StrictVersion("4.0.0"):
+            self.web_driver = webdriver.Chrome(options= chrome_options, executable_path=Constant.CHROME_PATH)
+        else:
+            s = Service(executable_path=Constant.CHROME_PATH)
+            self.web_driver = webdriver.Chrome(options= chrome_options, service=s)
         cf = configparser.ConfigParser()
         cf.read(config_path)
         secs = cf.sections()
