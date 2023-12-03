@@ -141,6 +141,8 @@ class askChatGPT:
                 return skill_output
             else:
                 return errorMessage
+        elif state2 == "<START>":
+            return skill_output
         return state2
 
     def step2_chat(self, Ques):
