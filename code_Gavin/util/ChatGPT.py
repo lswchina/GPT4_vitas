@@ -73,12 +73,14 @@ class askChatGPT:
         state = state.strip('"')
         self.__record_result(self.__Step1_Recorder_Path, "GPT4:\n" + state + "\n")
         self.__messageBody1.append({"role": "assistant", "content": state})
-        if state not in state_list and state != skill_output:
+        if state not in state_list and state != skill_output.strip():
             state = self.step1_prompt2(state, skill_output, state_list, 'not_exist', self.__messageBody1)
         elif state == "<START>":
             state = self.step1_prompt2(state, skill_output, state_list, 'wrong', self.__messageBody1)
         if len(self.__messageBody1) > 3:
             self.__messageBody1 = self.__messageBody1[:3]
+        if state == skill_output.strip():
+            return skill_output
         return state
 
     def getPromptGlobal1(self):
@@ -508,9 +510,9 @@ class askChatGPT:
             response2 = input("Step3_GPT4_2:\n")
         self.__record_result(self.__Step3_Recorder_Path, "GPT4:\n" + response2 + "\n")
         inQuoteWords = []
-        response_split = response2.split("Output: ")
-        if len(response_split) == 1:
-            response_split = response2.split("\"")
+        if "Output: " in response2:
+            response2 = response2.split("Output: ")[-1]
+        response_split = response2.split("\"")
         if len(response_split) == 1 or len(response_split) == 2:
             inQuoteWords.append(response2)
         else:
@@ -652,22 +654,3 @@ class askChatGPT:
     #             self.duration[self.index_in_duration] = duration
     #         self.last_invoke_time = invoke_time
     #         self.index_in_duration = (self.index_in_duration + 1) % 3
-
-
-if __name__ == '__main__':
-    gpt_response = '''["journey duration between [destination A] and [destination B]"]'''
-    index1 = gpt_response.find("[")
-    index2 = gpt_response.find("]", index1)
-    if index1 != -1 and index2 != -1:
-        response_list = []
-        while index2 != -1:
-            try:
-                response_list = list(eval(gpt_response[index1: index2 + 1]))
-                break
-            except:
-                index2 = gpt_response.find("]", index2 + 1)
-        if len(response_list) == 1 and response_list[0] == "":
-            response_list = []
-    else:
-        response_list = []
-    print(response_list)

@@ -73,12 +73,14 @@ class askChatGPT:
         state = state.strip('"')
         self.__record_result(self.__Step1_Recorder_Path, "GPT4:\n" + state + "\n")
         self.__messageBody1.append({"role": "assistant", "content": state})
-        if state not in state_list and state != skill_output:
+        if state not in state_list and state != skill_output.strip():
             state = self.step1_prompt2(state, skill_output, state_list, 'not_exist', self.__messageBody1)
         elif state == "<START>":
             state = self.step1_prompt2(state, skill_output, state_list, 'wrong', self.__messageBody1)
         if len(self.__messageBody1) > 3:
             self.__messageBody1 = self.__messageBody1[:3]
+        if state == skill_output.strip():
+            return skill_output
         return state
 
     def getPromptGlobal1(self):
@@ -141,6 +143,8 @@ class askChatGPT:
                 return skill_output
             else:
                 return errorMessage
+        elif state2 == "<START>":
+            return skill_output
         return state2
 
     def step2_chat(self, Ques):
@@ -506,9 +510,9 @@ class askChatGPT:
             response2 = input("Step3_GPT4_2:\n")
         self.__record_result(self.__Step3_Recorder_Path, "GPT4:\n" + response2 + "\n")
         inQuoteWords = []
-        response_split = response2.split("Output: ")
-        if len(response_split) == 1:
-            response_split = response2.split("\"")
+        if "Output: " in response2:
+            response2 = response2.split("Output: ")[-1]
+        response_split = response2.split("\"")
         if len(response_split) == 1 or len(response_split) == 2:
             inQuoteWords.append(response2)
         else:
