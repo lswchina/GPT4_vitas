@@ -1,6 +1,6 @@
 from Spider import Spider
 
-for i in range(2, 3):
+for i in range(14, 15):
     id = str(i)
     if len(id) == 1:
         config_path = '../config/config00' + id + '.ini'
