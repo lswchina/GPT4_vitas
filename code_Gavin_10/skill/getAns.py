@@ -133,7 +133,7 @@ class getAns:
                 if Ques != None:
                     self.FSM.addQuesToQuesSet(Ques)
                     response_list = self.gpt.step2_chat(Ques)
-                    self.FSM.addInputs(Ques, self.sysAns, [], response_list)
+                    self.FSM.addInputs(Ques, [], [], response_list)
                     for ans in response_list:
                         if not isinstance(ans, str):
                             continue
@@ -158,6 +158,13 @@ class getAns:
                     response_list = self.gpt.step2_chat(Ques)
                 self.FSM.addQuesToQuesSet(Ques)
                 self.FSM.addInputs(Ques, self.sysAns, [], response_list)
+        else:
+            for question in questions:
+                spacyRet = NLP.imergeNones(question)
+                Ques = self.FSM.has_ques(question)
+                if Ques != None:
+                    Ques.addHelpInputs(self.helpAns)
+                    Ques.addSysInputs(self.sysAns)
         return
 
     def getHelpResponse(self, questions, lastQ, Inpt):
