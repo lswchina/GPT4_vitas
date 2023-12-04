@@ -110,5 +110,5 @@ if __name__ == '__main__':
             fsm = FSM(gpt)
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)
-        # index = index + 1
+        index = index + 1
     UI.close_spider(spider)
