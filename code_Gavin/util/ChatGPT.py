@@ -652,3 +652,22 @@ class askChatGPT:
     #             self.duration[self.index_in_duration] = duration
     #         self.last_invoke_time = invoke_time
     #         self.index_in_duration = (self.index_in_duration + 1) % 3
+
+
+if __name__ == '__main__':
+    gpt_response = '''["journey duration between [destination A] and [destination B]"]'''
+    index1 = gpt_response.find("[")
+    index2 = gpt_response.find("]", index1)
+    if index1 != -1 and index2 != -1:
+        response_list = []
+        while index2 != -1:
+            try:
+                response_list = list(eval(gpt_response[index1: index2 + 1]))
+                break
+            except:
+                index2 = gpt_response.find("]", index2 + 1)
+        if len(response_list) == 1 and response_list[0] == "":
+            response_list = []
+    else:
+        response_list = []
+    print(response_list)

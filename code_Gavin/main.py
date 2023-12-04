@@ -80,7 +80,7 @@ if __name__ == '__main__':
         skill = Skill(EXCEL_PATH, INDEX)
         if skill.skillName == '<end_of_excel>':
             break
-        if skill.skillName != '':
+        if skill.skillName != '' and len(skill.invocation) > 0:
             skill_log_dir = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.type))
             if not os.path.exists(skill_log_dir):
                 os.makedirs(skill_log_dir)
