@@ -197,8 +197,11 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
         if lastQuestion == None or lastQuestion.get_ques() != "<END>":
             for sign in Constant.StopSign:
                 if sign in Inpt.get_input():
-                    Inpt = lastQuestion.has_input("what\'s the time")
-                    lastQuestion.addTimes(Inpt)
+                    if lastQuestion != None:
+                        Inpt = lastQuestion.has_input("what\'s the time")
+                        lastQuestion.addTimes(Inpt)
+                    else:
+                        Inpt = Input(0, 'what\'s the time')
                     Ques = fsm.has_ques("<END>")
                     if Ques == None:
                         Ques = Question("<END>")
