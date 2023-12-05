@@ -13,17 +13,19 @@ import step2_test_skill as test
 def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", help = "input the begin index", dest = "index", type=int, default=2)
+    parser.add_argument("-ei", help = "input the end index", dest = "endindex", type=int, default=1002)
     parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="1")
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "large_scale.xlsx")
     parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gavin/")
     parser.add_argument("-d", help = "input the chrome driver version", dest = "driver", type = str, default = "chromedriver_103")
     args = parser.parse_args()
     INDEX = args.index
+    END_INDEX = args.endindex
     CONFIG_ID = args.id
     EXCEL_PATH = "../dataset_2022/" + args.excel_name
     LOG_PATH = args.log_path
     DRIVER = args.driver
-    return INDEX, CONFIG_ID, EXCEL_PATH, LOG_PATH, DRIVER
+    return INDEX, END_INDEX, CONFIG_ID, EXCEL_PATH, LOG_PATH, DRIVER
 
 def init_dir(LOG_PATH):
     if not os.path.exists('../cookie'):
@@ -68,7 +70,7 @@ def init_constant(config_id, driver):
     Constant.CONTEXT_RELATED_LABEL = "context-related"
 
 if __name__ == '__main__':
-    INDEX, CONFIG_ID, EXCEL_PATH, LOG_PATH, DRIVER = getArgs()
+    INDEX, END_INDEX, CONFIG_ID, EXCEL_PATH, LOG_PATH, DRIVER = getArgs()
     if not os.path.exists(EXCEL_PATH):
         print("the excel path does not exist")
         sys.exit()
@@ -77,6 +79,8 @@ if __name__ == '__main__':
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
     while True:
+        if INDEX >= END_INDEX:
+            break
         skill = Skill(EXCEL_PATH, INDEX)
         if skill.skillName == '<end_of_excel>':
             break
