@@ -13,7 +13,7 @@ import step2_test_skill as test
 
 def getArgs():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="2")
+    parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="8")
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark2022.xlsx")
     parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/llama2_10min/")
     parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/llama2_10min/result/")
