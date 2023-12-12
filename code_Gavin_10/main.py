@@ -91,7 +91,7 @@ if __name__ == '__main__':
     else:
         model = None
         tokenizer = None
-    index = 1
+    index = 2
     while True:
         skill = Skill(EXCEL_PATH, index)
         if skill.skillName == '<end_of_excel>' or index > 100:
@@ -101,8 +101,12 @@ if __name__ == '__main__':
             if not os.path.exists(skill_log_path):
                 os.makedirs(skill_log_path)
             else:
-                index = index + 1
-                continue
+                if index == 2:
+                    os.rmdir(skill_log_path)
+                    os.makedirs(skill_log_path)
+                else:
+                    index = index + 1
+                    continue
             if LLM == "Llama2":
                 gpt = askLlama(skill.skillName, skill_log_path, True, model, tokenizer)
             else:
