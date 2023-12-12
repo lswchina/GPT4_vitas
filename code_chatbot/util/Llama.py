@@ -14,6 +14,9 @@ class askLlama:
     def test(self, prompt):
         if self.__useAPI == True:
             ans = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
+            pre = ans[:10]
+            beginInd = ans.find(pre, 1)
+            ans = ans[:beginInd]
         else:
             print("VPA app:\n" + prompt + "\n")
             ans = input("Llama-2-13b:\n")
