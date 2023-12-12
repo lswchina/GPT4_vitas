@@ -45,9 +45,9 @@ class askLlama:
         state = state.strip('"')
         self.__record_result(self.__Step1_Recorder_Path, "Llama-2-13b:\n" + state + "\n")
         if state not in state_list and state != skill_output:
-            state = self.step1_prompt2(state, skill_output, state_list, 'not_exist')
+            state = self.step1_prompt2(state, skill_output, state_list, 'not_exist', None)
         elif state == "<START>":
-            state = self.step1_prompt2(state, skill_output, state_list, 'wrong')
+            state = self.step1_prompt2(state, skill_output, state_list, 'wrong', None)
         return state
 
     def getPromptGlobal1(self):
@@ -240,11 +240,11 @@ class askLlama:
             if select_input != '':
                 break
         if select_input == '':
-            select_input = self.step3_prompt2(response, [], candidate_input_list)
+            select_input = self.step3_prompt2(response, [], candidate_input_list, None)
         else:
             better_inputs = self.__find_better_inputs(candidate_input_set_to_weight, candidate_Inpt_list, select_input)
             if len(better_inputs) != 0:
-                select_input = self.step3_prompt2(response, better_inputs, [])
+                select_input = self.step3_prompt2(response, better_inputs, [], None)
         return select_input
 
     def __find_better_inputs(self, candidate_input_set_to_weight, candidate_Inpt_list, select_input):
