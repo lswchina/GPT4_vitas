@@ -26,7 +26,7 @@ class Skill:
     def __findSubjectType(self, subjects, subjectType):#0:skill 1:user 2:other
         skillSim = 0
         userSim = 0
-        nlp = spacy.load("en_core_web_md")
+        nlp = spacy.load("en_core_web_sm")
         if type(subjects) == spacy.tokens.span.Span:
             subject = nlp(subjects.root.text)
         else:
@@ -238,7 +238,7 @@ class Skill:
         length = len(userAct)
         impActWord = ['get', 'help', 'change', 'repeat', 'set', 'collect', 'play']#instruction verbs
         weight = 0
-        nlp = spacy.load("en_core_web_md")
+        nlp = spacy.load("en_core_web_sm")
         
         verb = nlp(userAct[0].text)[0]
         
