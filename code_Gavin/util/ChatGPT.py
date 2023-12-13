@@ -71,6 +71,7 @@ class askChatGPT:
                 print("Step1_User:\n" + promptBody + "\n")
             state = input("Step1_GPT4:\n")
         state = state.strip('"')
+        state = state.strip("'")
         self.__record_result(self.__Step1_Recorder_Path, "GPT4:\n" + state + "\n")
         self.__messageBody1.append({"role": "assistant", "content": state})
         if state not in state_list and state != skill_output.strip():
@@ -137,6 +138,8 @@ class askChatGPT:
         else:
             print("Step1_User_2:\n" + promptBody2)
             state2 = input("Step1_GPT4_2:\n")
+        state2 = state2.strip('"')
+        state2 = state2.strip("'")
         self.__record_result(self.__Step1_Recorder_Path, "GPT4:\n" + state2 + "\n")
         if state2 not in state_list:
             if errorMessage == 'not_exist' or errorMessage == 'wrong':
