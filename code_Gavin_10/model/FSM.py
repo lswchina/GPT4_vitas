@@ -234,7 +234,8 @@ class FSM():
         messageBody.append({"role": "user", "content": self.__gpt.getPromptGlobal1() + promptBody})
         messageBody.append({"role": "assistant", "content": state})
         if state1 == "":
-            state = self.__gpt.step1_prompt2(state, skill_output, state_list, 'wrong', messageBody)
+            if not NLP.isWhQ(state) and not NLP.isWhQ(skill_output):
+                state = self.__gpt.step1_prompt2(state, skill_output, state_list, 'wrong', messageBody)
         else:
             state = self.__gpt.step1_prompt2(state, skill_output, state_list, state1, messageBody)
         return state
