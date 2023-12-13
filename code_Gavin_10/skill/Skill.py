@@ -1,11 +1,12 @@
 import spacy
 import re
+import os
 import sys
 import openpyxl
 from util.NLP import NLP
 
 class Skill:
-    def __init__(self, excelfilename, line):
+    def __init__(self, excelfilename, log_path, line):
         self.invocation = []
         self.skillName = ''
         self.supportRegion = True
@@ -16,7 +17,8 @@ class Skill:
         self.__skillActions = []#skill functionality
         self.__userActions = []
         self.__otherActions = []
-        if self.skillName != '' and self.skillName != '<end_of_excel>':
+        skill_log_path = os.path.join(log_path, re.sub(r'(\W+)', '_', self.skillName))
+        if self.skillName != '' and self.skillName != '<end_of_excel>' and not os.path.exists(skill_log_path):
             spacyRets = []
             for sent in self.__description_sents:
                 spacyRets.append(NLP.imergeNones(sent))
