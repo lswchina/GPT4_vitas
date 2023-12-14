@@ -29,7 +29,10 @@ def isCrash(lastRequest, request):
 def isUnrespondingVUI(last_input, lastRequest, request, spider, FileName):
     if len(request) == 0:
         inpt = 'what\'s the time'
-        requests = UI.input_and_response(spider, inpt, FileName, True)
+        try:
+            requests = UI.input_and_response(spider, inpt, FileName, True)
+        except:
+            return True, 1
         if len(requests) != 0:
             print(requests)
         if len(requests) == 0 or requests[-1][1] != 'Alexa':
