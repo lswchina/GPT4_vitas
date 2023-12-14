@@ -14,8 +14,8 @@ import step2_test_skill as test
 
 def getArgs():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="18")
-    parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark2022.xlsx")
+    parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="3")
+    parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark2022_40.xlsx")
     parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/gavin+llama2_10min/")
     parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/gavin+llama2_10min/result/")
     parser.add_argument("-m", help = "input the LLM", dest = "llm", type = str, default = "Llama2")
@@ -91,10 +91,10 @@ if __name__ == '__main__':
     else:
         model = None
         tokenizer = None
-    index = 10
+    index = 1
     while True:
         skill = Skill(EXCEL_PATH, LOG_PATH, index)
-        if skill.skillName == '<end_of_excel>' or index > 100:
+        if skill.skillName == '<end_of_excel>' or index > 40:
             break
         if skill.skillName != '':
             skill_log_path = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.skillName))
