@@ -205,7 +205,10 @@ class askLlama:
             self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody + "\n")
         if self.__useAPI == True:
             responses = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("Output: ")
-            response = responses[0] + "Output: " + responses[1].split("\n")[0]
+            if len(responses) > 1:
+                response = responses[0] + "Output: " + responses[1].split("\n")[0]
+            else:
+                response = responses[0]
         else:
             if hasGlobal3 == False:
                 print("Step3_User:\n" + self.__promptGlobal3 + promptBody + "\n")
@@ -216,29 +219,32 @@ class askLlama:
         self.__record_result(self.__Step3_Recorder_Path, "Llama-2-13b:\n" + response + "\n")
         select_input = ''
         inQuoteWords = []
-        response = response.split("Output: ")[1]
-        response_split = response.split("\"")
-        if len(response_split) == 2:
-            inQuoteWords.append(response)
-        else:
-            for i, word in enumerate(response_split):
-                if i % 2 == 1:
-                    inQuoteWords.append(word)
-                else:
-                    temp_split = word.split("'")
-                    if len(temp_split) >= 3:
-                        for j, word_ in enumerate(temp_split):
-                            if j % 2 == 1:
-                                inQuoteWords.append(word_)
-                    elif len(response_split) == 1:
+        if "Output: " in response:
+            response = response.split("Output: ")[1]
+            response_split = response.split("\"")
+            if len(response_split) == 2:
+                inQuoteWords.append(response)
+            else:
+                for i, word in enumerate(response_split):
+                    if i % 2 == 1:
                         inQuoteWords.append(word)
-        for input_ in candidate_input_list:
-            for word in inQuoteWords:
-                if input_ == word.lower():
-                    select_input = input_
+                    else:
+                        temp_split = word.split("'")
+                        if len(temp_split) >= 3:
+                            for j, word_ in enumerate(temp_split):
+                                if j % 2 == 1:
+                                    inQuoteWords.append(word_)
+                        elif len(response_split) == 1:
+                            inQuoteWords.append(word)
+            for input_ in candidate_input_list:
+                for word in inQuoteWords:
+                    if input_ == word.lower():
+                        select_input = input_
+                        break
+                if select_input != '':
                     break
-            if select_input != '':
-                break
+        else:
+            response = ""
         if select_input == '':
             select_input = self.step3_prompt2(response, [], candidate_input_list, None)
         else:
