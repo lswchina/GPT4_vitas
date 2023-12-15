@@ -20,12 +20,12 @@ def load_model(model_path):
         tokenizer = AutoTokenizer.from_pretrained(model_path)
     gc.collect()
     torch.cuda.empty_cache()
-    model_16bit = model_16bit.to('cuda:0')
+    model_16bit = model_16bit.to('cuda:1')
     tokenizer.pad_token_id = tokenizer.eos_token_id
     return model_16bit, tokenizer
 
 def input_and_output(prompt, model, tokenizer):
-    inputs = tokenizer(prompt, return_token_type_ids=False, return_tensors="pt").to('cuda:0')
+    inputs = tokenizer(prompt, return_token_type_ids=False, return_tensors="pt").to('cuda:1')
     outputs = model.generate(**inputs, max_new_tokens=max(200, len(inputs)), temperature=0.1)
     results = tokenizer.batch_decode(outputs, skip_special_tokens=True)
     result = results[0][len(prompt):]
