@@ -18,7 +18,7 @@ class Skill:
         self.__userActions = []
         self.__otherActions = []
         skill_log_path = os.path.join(log_path, re.sub(r'(\W+)', '_', self.skillName))
-        if self.skillName != '' and self.skillName != '<end_of_excel>' and not os.path.exists(skill_log_path):
+        if self.skillName != '' and self.skillName != '<end_of_excel>': #and not os.path.exists(skill_log_path):
             spacyRets = []
             for sent in self.__description_sents:
                 spacyRets.append(NLP.imergeNones(sent))
