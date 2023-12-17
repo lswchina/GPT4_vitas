@@ -16,7 +16,7 @@ def getArgs():
     parser.add_argument("-ei", help = "input the end index", dest = "endindex", type=int, default=100)
     parser.add_argument("-c", help = "input the configuration file name", dest = "id", type=str, default="config000.ini")
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark2022.xlsx")
-    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/benchmark_gavin/")
+    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/benchmark_elevate/")
     parser.add_argument("-d", help = "input the chrome driver version", dest = "driver", type = str, default = "chromedriver_103")
     args = parser.parse_args()
     INDEX = args.index
