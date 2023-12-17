@@ -30,5 +30,3 @@ python main.py
     -l <path to save communication logs and results, default as ../../output/benchmark_elevate> 
     -d <chromedriver name in the chrome directory, default as chromedriver_103>
 ```
-
-## How to do experiment
