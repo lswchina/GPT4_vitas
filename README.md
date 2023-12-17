@@ -1,4 +1,4 @@
-# GPT4_vitas
+# Elevate
 
 ## Requirement
 
@@ -12,7 +12,7 @@
 `export OPENAI_API_KEY=<YOUR OPENAI API KEY>`
 
 ### Other
-1. **chromedriver** that matches your chrome version
+1. the **chromedriver** that matches your chrome version
 2. an **amazon developer account** that can use the simulator (change the config000.ini in config directory to add your acount)
 3. an **Azure account** that can access to the openAI API (change the config000.ini in config directory to add the apibase and apiversion)
 4. We need to login to the amazon developer account to start using the simulator. In most of the cases amazon will send an email to your linked email address for verifications. We use pop to read the emails, so make sure the **110 port** is open.
@@ -20,7 +20,7 @@
 ## How to run Elevate
 
 ```
-cd code_Gavin_10
+cd code
 
 python main.py 
     -i <begin index of skill, default as 1> 
