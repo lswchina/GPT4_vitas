@@ -3,3 +3,5 @@ selenium
 openai==0.28
 openpyxl
 np
+transformers
+accelerate
