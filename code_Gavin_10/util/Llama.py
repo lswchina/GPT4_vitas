@@ -41,9 +41,9 @@ class askLlama:
                 print("Step1_User:\n" + self.__promptGlobal1 + promptBody + "\n")
             else:
                 print("Step1_User:\n" + promptBody + "\n")
-            state = input("Step1_Llama-2-13b:\n")
+            state = input("Step1_Llama-2-70b:\n")
         state = state.strip('"')
-        self.__record_result(self.__Step1_Recorder_Path, "Llama-2-13b:\n" + state + "\n")
+        self.__record_result(self.__Step1_Recorder_Path, "Llama-2-70b:\n" + state + "\n")
         if state not in state_list and state != skill_output:
             state = self.step1_prompt2(state, skill_output, state_list, 'not_exist', None)
         elif state == "<START>":
@@ -83,8 +83,8 @@ class askLlama:
             state2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("\n")[0]
         else:
             print("Step1_User_2:\n" + promptBody2)
-            state2 = input("Step1_Llama-2-13b_2:\n")
-        self.__record_result(self.__Step1_Recorder_Path, "Llama-2-13b:\n" + state2 + "\n")
+            state2 = input("Step1_Llama-2-70b_2:\n")
+        self.__record_result(self.__Step1_Recorder_Path, "Llama-2-70b:\n" + state2 + "\n")
         if state2 not in state_list:
             if errorMessage == 'not_exist' or errorMessage == 'wrong':
                 return skill_output
@@ -112,8 +112,8 @@ class askLlama:
                 print("Step2_User:\n" + self.__promptGlobal2 + promptBody + "\n")
             else:
                 print("Step2_User:\n" + promptBody + "\n")
-            gpt_response = input("Step2_Llama-2-13b:\n")
-        self.__record_result(self.__Step2_Recorder_Path, "Llama-2-13b:\n" + gpt_response + "\n")
+            gpt_response = input("Step2_Llama-2-70b:\n")
+        self.__record_result(self.__Step2_Recorder_Path, "Llama-2-70b:\n" + gpt_response + "\n")
         index1 = gpt_response.find("[")
         index2 = gpt_response.rfind("]")
         if index1 != -1 and index2 != -1:
@@ -154,8 +154,8 @@ class askLlama:
             responses2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("\n")[0]
         else:
             print("Step2_User_2:\n" + promptBody2 + "\n")
-            responses2 = input("Step2_Llama-2-13b_2:\n")
-        self.__record_result(self.__Step2_Recorder_Path, "Llama-2-13b:\n" + responses2 + "\n")
+            responses2 = input("Step2_Llama-2-70b_2:\n")
+        self.__record_result(self.__Step2_Recorder_Path, "Llama-2-70b:\n" + responses2 + "\n")
         index1 = responses2.find("[")
         index2 = responses2.find("]")
         if index1 != -1 and index2 != -1 and index2 > index1 + 1:
@@ -214,9 +214,9 @@ class askLlama:
                 print("Step3_User:\n" + self.__promptGlobal3 + promptBody + "\n")
             else:
                 print("Step3_User:\n" + promptBody + "\n")
-            response = input("Step3_Llama-2-13b:\n")
+            response = input("Step3_Llama-2-70b:\n")
 
-        self.__record_result(self.__Step3_Recorder_Path, "Llama-2-13b:\n" + response + "\n")
+        self.__record_result(self.__Step3_Recorder_Path, "Llama-2-70b:\n" + response + "\n")
         select_input = ''
         inQuoteWords = []
         if "Output: " in response:
@@ -347,8 +347,8 @@ class askLlama:
                 response2 += responses2[1].split("\n")[0]
         else:
             print("Step3_User_2:\n" + promptBody2 + "\n")
-            response2 = input("Step3_Llama-2-13b_2:\n")
-        self.__record_result(self.__Step3_Recorder_Path, "Llama-2-13b:\n" + response2 + "\n")
+            response2 = input("Step3_Llama-2-70b_2:\n")
+        self.__record_result(self.__Step3_Recorder_Path, "Llama-2-70b:\n" + response2 + "\n")
         inQuoteWords = []
         response_split = response2.split("Output: ")
         if len(response_split) == 1:
