@@ -35,15 +35,17 @@ class askLlama:
         else:
             self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody + "\n")
         if self.__useAPI == True:
-            state = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
+            # state = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
+            state = hug.send_and_receive(prompt, self.__model).split("\n")[0]
         else:
             if hasGlobal1 == False:
                 print("Step1_User:\n" + self.__promptGlobal1 + promptBody + "\n")
             else:
                 print("Step1_User:\n" + promptBody + "\n")
-            state = input("Step1_Llama-2-70b:\n")
+            state = input("Step1_Llama-2-70b-hf:\n")
+        state = state.strip()
         state = state.strip('"')
-        self.__record_result(self.__Step1_Recorder_Path, "Llama-2-70b:\n" + state + "\n")
+        self.__record_result(self.__Step1_Recorder_Path, "Llama-2-70b-hf:\n" + state + "\n")
         if state not in state_list and state != skill_output:
             state = self.step1_prompt2(state, skill_output, state_list, 'not_exist', None)
         elif state == "<START>":
@@ -80,11 +82,19 @@ class askLlama:
             promptBody2 = "The state \"" + errorMessage + "\" and sentence " + skill_output + " are semantically similar."
         self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
-            state2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("\n")[0]
+            # state2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("\n")[0]
+            results = hug.send_and_receive(promptBody2, self.__model).split("\n")
+            state2 = ""
+            for i in range(len(results)):
+                state2 = results[i]
+                if state2 != "":
+                    break
         else:
             print("Step1_User_2:\n" + promptBody2)
             state2 = input("Step1_Llama-2-70b_2:\n")
-        self.__record_result(self.__Step1_Recorder_Path, "Llama-2-70b:\n" + state2 + "\n")
+        state2 = state2.strip()
+        state2 = state2.strip('"')
+        self.__record_result(self.__Step1_Recorder_Path, "Llama-2-70b-hf:\n" + state2 + "\n")
         if state2 not in state_list:
             if errorMessage == 'not_exist' or errorMessage == 'wrong':
                 return skill_output
@@ -106,19 +116,30 @@ class askLlama:
         else:
             self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody + "\n")
         if self.__useAPI == True:
-            gpt_response = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
+            # gpt_response = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
+            results = hug.send_and_receive(prompt, self.__model).split("\n")
+            gpt_response = ""
+            for i in range(len(results)):
+                gpt_response = results[i]
+                if gpt_response != "":
+                    break
         else:
             if hasGlobal2 == False:
                 print("Step2_User:\n" + self.__promptGlobal2 + promptBody + "\n")
             else:
                 print("Step2_User:\n" + promptBody + "\n")
-            gpt_response = input("Step2_Llama-2-70b:\n")
-        self.__record_result(self.__Step2_Recorder_Path, "Llama-2-70b:\n" + gpt_response + "\n")
+            gpt_response = input("Step2_Llama-2-70b-hf:\n")
+        self.__record_result(self.__Step2_Recorder_Path, "Llama-2-70b-hf:\n" + gpt_response + "\n")
         index1 = gpt_response.find("[")
-        index2 = gpt_response.rfind("]")
+        index2 = gpt_response.find("]")
         if index1 != -1 and index2 != -1:
-            gpt_response = gpt_response[index1: index2 + 1]
-            response_list = list(eval(gpt_response))
+            response_list = []
+            while index2 != -1:
+                try:
+                    response_list = list(eval(gpt_response[index1: index2 + 1]))
+                    break
+                except:
+                    index2 = gpt_response.find("]", index2 + 1)
             if len(response_list) == 1 and response_list[0] == "":
                 response_list = []
         else:
@@ -151,11 +172,17 @@ class askLlama:
                 promptBody2 = promptBody2 + "responses to " + state + "."
         self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
-            responses2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("\n")[0]
+            # responses2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("\n")[0]
+            results = hug.send_and_receive(promptBody2, self.__model).split("\n")[0]
+            responses2 = ""
+            for i in range(len(results)):
+                responses2 = results[i]
+                if responses2 != "":
+                    break
         else:
             print("Step2_User_2:\n" + promptBody2 + "\n")
             responses2 = input("Step2_Llama-2-70b_2:\n")
-        self.__record_result(self.__Step2_Recorder_Path, "Llama-2-70b:\n" + responses2 + "\n")
+        self.__record_result(self.__Step2_Recorder_Path, "Llama-2-70b-hf:\n" + responses2 + "\n")
         index1 = responses2.find("[")
         index2 = responses2.find("]")
         if index1 != -1 and index2 != -1 and index2 > index1 + 1:
@@ -204,7 +231,8 @@ class askLlama:
         else:
             self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody + "\n")
         if self.__useAPI == True:
-            responses = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("Output: ")
+            # responses = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("Output: ")
+            responses = hug.send_and_receive(prompt, self.__model).split("Output: ")
             if len(responses) > 1:
                 response = responses[0] + "Output: " + responses[1].split("\n")[0]
             else:
@@ -214,9 +242,9 @@ class askLlama:
                 print("Step3_User:\n" + self.__promptGlobal3 + promptBody + "\n")
             else:
                 print("Step3_User:\n" + promptBody + "\n")
-            response = input("Step3_Llama-2-70b:\n")
+            response = input("Step3_Llama-2-70b-hf:\n")
 
-        self.__record_result(self.__Step3_Recorder_Path, "Llama-2-70b:\n" + response + "\n")
+        self.__record_result(self.__Step3_Recorder_Path, "Llama-2-70b-hf:\n" + response + "\n")
         select_input = ''
         inQuoteWords = []
         if "Output: " in response:
@@ -341,14 +369,15 @@ class askLlama:
             promptBody2 = promptBody2 + "Please choose another input event from the input event list " + str(candidate_input_list) + "."
         self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
-            responses2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("Output: ")
+            # responses2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("Output: ")
+            responses2 = hug.send_and_receive(promptBody2, self.__model).split("Output: ")
             response2 = responses2[0] + "Output: "
             if len(responses2) > 1:
                 response2 += responses2[1].split("\n")[0]
         else:
             print("Step3_User_2:\n" + promptBody2 + "\n")
             response2 = input("Step3_Llama-2-70b_2:\n")
-        self.__record_result(self.__Step3_Recorder_Path, "Llama-2-70b:\n" + response2 + "\n")
+        self.__record_result(self.__Step3_Recorder_Path, "Llama-2-70b-hf:\n" + response2 + "\n")
         inQuoteWords = []
         response_split = response2.split("Output: ")
         if len(response_split) == 1:

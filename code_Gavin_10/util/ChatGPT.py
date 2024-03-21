@@ -5,7 +5,7 @@ import random
 from copy import deepcopy
 
 class askChatGPT:
-    def __init__(self, skillName, log_dir, useAPI, config_path):
+    def __init__(self, skillName, log_dir, useAPI, config_path, ablation):
         self.skillName = skillName
         if log_dir != "":
             self.__Step1_Recorder_Path = os.path.join(log_dir, "step1_findState.txt")
@@ -29,6 +29,7 @@ class askChatGPT:
             {"role": "system", "content": "Choose one input from the input event list to cover more future states."}
         ]
         self.__config_path = config_path
+        self.ablation = ablation
 
     def step1_chat(self, skill_output, state_list):
         cf = configparser.ConfigParser()
@@ -87,24 +88,29 @@ class askChatGPT:
     def getPromptGlobal1(self):
         if self.__promptGlobal1 != "":
             return self.__promptGlobal1
-        step1_Example = {'sentence: "What are you interested in.", state list: []': '"What are you interested in."',
-                 'sentence: "Ok, which other animal sound do you want to listen to.", state list: ["What are you interested in."]': '"Ok, which other animal sound do you want to listen to."',
-                 'sentence: "Alright, now ask me for another animal.", state list: ["What are you interested in.", "Come on, ask for another animal."]': '"Come on, ask for another animal."',
-                 'sentence: "What animal sound do you like to hear.", state list: ["What are you interested in.", "Ok, which other animal sound do you want to listen to."]': '"Ok, which other animal sound do you want to listen to."',
-                 }
-        self.__promptGlobal1 = "We use a finite state machine to respresent an Alexa Skill's behavior. " 
-        self.__promptGlobal1 = self.__promptGlobal1 + "The skill's output sentences are mapped to states in the FSM. "
-        self.__promptGlobal1 = self.__promptGlobal1 + "Semantically similar sentences are mapped to the same state. "
-        self.__promptGlobal1 = self.__promptGlobal1 + "Given a sentence and the FSM's state list, please try to find a semantically similar state in the state list. "
-        self.__promptGlobal1 = self.__promptGlobal1 + "If the semantically similar state is found, output the state. "
-        self.__promptGlobal1 = self.__promptGlobal1 + "Otherwise, output the sentence itself.\n"
-        self.__promptGlobal1 = self.__promptGlobal1 + "For example:\n"
-        for skill_output in step1_Example.keys():
-            self.__promptGlobal1 = self.__promptGlobal1 + "Input: " + skill_output + "\n"
-            self.__promptGlobal1 = self.__promptGlobal1 + "Output: " + step1_Example[skill_output] + "\n\n"
+        if self.ablation != "1":
+            step1_Example = {'sentence: "What are you interested in.", state list: []': '"What are you interested in."',
+                    'sentence: "Ok, which other animal sound do you want to listen to.", state list: ["What are you interested in."]': '"Ok, which other animal sound do you want to listen to."',
+                    'sentence: "Alright, now ask me for another animal.", state list: ["What are you interested in.", "Come on, ask for another animal."]': '"Come on, ask for another animal."',
+                    'sentence: "What animal sound do you like to hear.", state list: ["What are you interested in.", "Ok, which other animal sound do you want to listen to."]': '"Ok, which other animal sound do you want to listen to."',
+                    }
+            self.__promptGlobal1 = "We use a finite state machine to respresent an Alexa Skill's behavior. " 
+            self.__promptGlobal1 = self.__promptGlobal1 + "The skill's output sentences are mapped to states in the FSM. "
+            self.__promptGlobal1 = self.__promptGlobal1 + "Semantically similar sentences are mapped to the same state. "
+            self.__promptGlobal1 = self.__promptGlobal1 + "Given a sentence and the FSM's state list, please try to find a semantically similar state in the state list. "
+            self.__promptGlobal1 = self.__promptGlobal1 + "If the semantically similar state is found, output the state. "
+            self.__promptGlobal1 = self.__promptGlobal1 + "Otherwise, output the sentence itself.\n"
+            self.__promptGlobal1 = self.__promptGlobal1 + "For example:\n"
+            for skill_output in step1_Example.keys():
+                self.__promptGlobal1 = self.__promptGlobal1 + "Input: " + skill_output + "\n"
+                self.__promptGlobal1 = self.__promptGlobal1 + "Output: " + step1_Example[skill_output] + "\n\n"
+        else:
+            self.__promptGlobal1 = "Given a sentence and the sentence list, please try to find a semantically similar sentence in the sentence list. "
         return self.__promptGlobal1
 
     def step1_prompt2(self, state, skill_output, state_list, errorMessage, messageBody):
+        if self.ablation == "1":
+            return skill_output
         cf = configparser.ConfigParser()
         cf.read(self.__config_path)
         openai.api_type = "azure"
@@ -217,6 +223,8 @@ class askChatGPT:
         return response_list
             
     def step2_prompt2(self, inpt, Ques, context_related_inputs, type, state, nouns):
+        if self.ablation == "2":
+            return context_related_inputs
         cf = configparser.ConfigParser()
         cf.read(self.__config_path)
         openai.api_type = "azure"
@@ -292,21 +300,26 @@ class askChatGPT:
             return []
 
     def __getPromptGlobal2(self):
-        step2_Example = {"Say today's deals to get started": '["today\'s deals"]',
-                        "You can choose a part type like ssd, hdd, cpu, or pick one from the list in the skill's description.": '["ssd", "hdd", "cpu"]',
-                        "Do you want to see hdd deals?": '["yes", "no"]',
-                        "Say next to proceed to the next step, or specify a step by saying step followed by a step number between 1 and 9.": '["next", "step 1", "step 2", "step 3", "step 4", "step 5", "step 6", "step 7", "step 8", "step 9"]',
-                        "Which do you prefer, coffee or tea?": '["coffee", "tea"]',
-                        "Would you like to start and register your account?": '["yes", "no"]',
-                        "Please tell me the date you are traveling.": '["today", "tomorrow", "2023.12.31", "National Day"]',
-                        "What animal sound do you like to hear?": '["rabbit", "rat", "cat", "dog", "monkey", "tiger", "lion"]'
-                        }
-        self.__promptGlobal2 = "Given a sentence and its context, find all the responses to the sentence in a python list."
-        self.__promptGlobal2 = self.__promptGlobal2 + "The responses should be precious and simple.\n"
-        self.__promptGlobal2 = self.__promptGlobal2 + "For example:\n"
-        for skill_output in step2_Example.keys():
-            self.__promptGlobal2 = self.__promptGlobal2 + 'Input: skill: "' + skill_output + '"\n'
-            self.__promptGlobal2 = self.__promptGlobal2 + "Output: " + step2_Example[skill_output] + "\n\n"
+        if self.__promptGlobal2 != "":
+            return self.__promptGlobal2
+        if self.ablation != "2":
+            step2_Example = {"Say today's deals to get started": '["today\'s deals"]',
+                            "You can choose a part type like ssd, hdd, cpu, or pick one from the list in the skill's description.": '["ssd", "hdd", "cpu"]',
+                            "Do you want to see hdd deals?": '["yes", "no"]',
+                            "Say next to proceed to the next step, or specify a step by saying step followed by a step number between 1 and 9.": '["next", "step 1", "step 2", "step 3", "step 4", "step 5", "step 6", "step 7", "step 8", "step 9"]',
+                            "Which do you prefer, coffee or tea?": '["coffee", "tea"]',
+                            "Would you like to start and register your account?": '["yes", "no"]',
+                            "Please tell me the date you are traveling.": '["today", "tomorrow", "2023.12.31", "National Day"]',
+                            "What animal sound do you like to hear?": '["rabbit", "rat", "cat", "dog", "monkey", "tiger", "lion"]'
+                            }
+            self.__promptGlobal2 = "Given a sentence and its context, find all the responses to the sentence in a python list."
+            self.__promptGlobal2 = self.__promptGlobal2 + "The responses should be precious and simple.\n"
+            self.__promptGlobal2 = self.__promptGlobal2 + "For example:\n"
+            for skill_output in step2_Example.keys():
+                self.__promptGlobal2 = self.__promptGlobal2 + 'Input: skill: "' + skill_output + '"\n'
+                self.__promptGlobal2 = self.__promptGlobal2 + "Output: " + step2_Example[skill_output] + "\n\n"
+        else:
+            self.__promptGlobal2 = "Given a sentence, find all the responses to the sentence in a python list."
         return self.__promptGlobal2
 
     def __remove_low_certain(self, response_list):
@@ -397,6 +410,8 @@ class askChatGPT:
         return select_input
 
     def __find_better_inputs(self, candidate_input_set_to_weight, candidate_Inpt_list, select_input):
+        if self.ablation == "3":
+            return []
         better_inputs = []
         weight_of_select_input = candidate_input_set_to_weight[select_input]
         time_of_select_input = 0
@@ -449,33 +464,40 @@ class askChatGPT:
         return better_inputs
 
     def __getPromptGlobal3(self):
-        step3_Example = {'''<current state>="Say today's deals to get started.",FSM={Σ={"stop":0,"help":0,"today's deals":0},δ=()}''': ['''inputs after step1:["stop","help","today's deals"]. inputs after step 2:["today's deals"]. step 3:choose "today\'s deals"''', '"today\'s deals"'],
-                        '''<current state>="You can choose a part type like ssd, hdd, cpu, or pick one from the list in the skill's description.",FSM={Σ={"stop":0,"help":0,"ssd":1,"hdd":1,"cpu":0,"today's deals":1},δ=([<current state>,"today's deals",<current state>])}.''': ['''inputs after step1:["stop","help","ssd","hdd","cpu"]. inputs after step2:["ssd","hdd","cpu"] left. step3:choose "cpu".''', '"cpu"']
-                        }
-        
-        self.__promptGlobal3 = "We use a finite state machine to represent an Alexa Skill's behavior. "
-        self.__promptGlobal3 = self.__promptGlobal3 + "Our FSM has Q(state set), Σ(input event dictionary(key: input event, value: invocation times)) and δ(transition set). "
-        self.__promptGlobal3 = self.__promptGlobal3 + "The transition from <current state> to <next state> by <input1> is represented as [<current state>, <input1>, <next state>]. "
-        self.__promptGlobal3 = self.__promptGlobal3 + "If <next state> = <current state>, <input1> leads to a repeated state. "
-        self.__promptGlobal3 = self.__promptGlobal3 + "If <next state> contains error information, <input1> leads to an error state.\n"
-        
-        # self.__promptGlobal3 = self.__promptGlobal3 + "We map the skill's outputs to states and users' inputs to input events. "
-        # self.__promptGlobal3 = self.__promptGlobal3 + "The process of skills taking an input and giving new outputs are mapped to transitions in the FSM. "
-        self.__promptGlobal3 = self.__promptGlobal3 + "Given the FSM and the current state, please choose an input event that is most likely to help us discover new states.\n"
+        if self.__promptGlobal3 != "":
+            return self.__promptGlobal3
+        if self.ablation != "3":
+            step3_Example = {'''<current state>="Say today's deals to get started.",FSM={Σ={"stop":0,"help":0,"today's deals":0},δ=()}''': ['''inputs after step1:["stop","help","today's deals"]. inputs after step 2:["today's deals"]. step 3:choose "today\'s deals"''', '"today\'s deals"'],
+                            '''<current state>="You can choose a part type like ssd, hdd, cpu, or pick one from the list in the skill's description.",FSM={Σ={"stop":0,"help":0,"ssd":1,"hdd":1,"cpu":0,"today's deals":1},δ=([<current state>,"today's deals",<current state>])}.''': ['''inputs after step1:["stop","help","ssd","hdd","cpu"]. inputs after step2:["ssd","hdd","cpu"] left. step3:choose "cpu".''', '"cpu"']
+                            }
+            
+            self.__promptGlobal3 = "We use a finite state machine to represent an Alexa Skill's behavior. "
+            self.__promptGlobal3 = self.__promptGlobal3 + "Our FSM has Q(state set), Σ(input event dictionary(key: input event, value: invocation times)) and δ(transition set). "
+            self.__promptGlobal3 = self.__promptGlobal3 + "The transition from <current state> to <next state> by <input1> is represented as [<current state>, <input1>, <next state>]. "
+            self.__promptGlobal3 = self.__promptGlobal3 + "If <next state> = <current state>, <input1> leads to a repeated state. "
+            self.__promptGlobal3 = self.__promptGlobal3 + "If <next state> contains error information, <input1> leads to an error state.\n"
+            
+            # self.__promptGlobal3 = self.__promptGlobal3 + "We map the skill's outputs to states and users' inputs to input events. "
+            # self.__promptGlobal3 = self.__promptGlobal3 + "The process of skills taking an input and giving new outputs are mapped to transitions in the FSM. "
+            self.__promptGlobal3 = self.__promptGlobal3 + "Given the FSM and the current state, please choose an input event that is most likely to help us discover new states.\n"
 
-        self.__promptGlobal3 = self.__promptGlobal3 + "The procedure contains 3 steps.\n"
-        self.__promptGlobal3 = self.__promptGlobal3 + "Step1: discard input events that lead to repeated/error state\n"
-        self.__promptGlobal3 = self.__promptGlobal3 + "Step2: from those input events that have never been invoked, retain one that is most likely to trigger new state and discard the others\n"
-        self.__promptGlobal3 = self.__promptGlobal3 + "Step3: from the rest input events, pick one as the actual input considering invocation times and relevance to the current state\n"
-        
-        self.__promptGlobal3 = self.__promptGlobal3 + "For example:\n"
-        for state_info, v in step3_Example.items():
-            self.__promptGlobal3 = self.__promptGlobal3 + "Input: " + state_info + "\n"
-            self.__promptGlobal3 = self.__promptGlobal3 + "Thought: " + v[0] + "\n"
-            self.__promptGlobal3 = self.__promptGlobal3 + "Output: " + v[1] + "\n\n"
+            self.__promptGlobal3 = self.__promptGlobal3 + "The procedure contains 3 steps.\n"
+            self.__promptGlobal3 = self.__promptGlobal3 + "Step1: discard input events that lead to repeated/error state\n"
+            self.__promptGlobal3 = self.__promptGlobal3 + "Step2: from those input events that have never been invoked, retain one that is most likely to trigger new state and discard the others\n"
+            self.__promptGlobal3 = self.__promptGlobal3 + "Step3: from the rest input events, pick one as the actual input considering invocation times and relevance to the current state\n"
+            
+            self.__promptGlobal3 = self.__promptGlobal3 + "For example:\n"
+            for state_info, v in step3_Example.items():
+                self.__promptGlobal3 = self.__promptGlobal3 + "Input: " + state_info + "\n"
+                self.__promptGlobal3 = self.__promptGlobal3 + "Thought: " + v[0] + "\n"
+                self.__promptGlobal3 = self.__promptGlobal3 + "Output: " + v[1] + "\n\n"
+        else:
+            self.__promptGlobal3 = "Given a sentence, please choose an input event that is most likely to help us discover new states.\n"
         return self.__promptGlobal3
 
     def step3_prompt2(self, inpt, better_inputs, candidate_input_list, messageBody):
+        if self.ablation == "3":
+            return inpt
         cf = configparser.ConfigParser()
         cf.read(self.__config_path)
         openai.api_type = "azure"
@@ -541,6 +563,8 @@ class askChatGPT:
         return candidate_input_list[ind]
 
     def __gen_prompt_for_step3(self, states, state, transitions, candidate_Inpt_list, candidate_input_list):
+        if self.ablation == "3":
+            return "sentence=" + state, {}
         candidate_input_set_to_weight = {}
         for i in candidate_input_list:
             candidate_input_set_to_weight[i] = 4

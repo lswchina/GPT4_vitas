@@ -1,6 +1,7 @@
 from lib2to3.pgen2.token import tok_name
 import os
 import random
+import emoji
 from copy import deepcopy
 import util.Huggingface as hug
 
@@ -13,13 +14,21 @@ class askLlama:
 
     def test(self, prompt):
         if self.__useAPI == True:
-            ans = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
-            pre = ans[:10]
-            beginInd = ans.find(pre, 1)
-            ans = ans[:beginInd]
+            # ans = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
+            results = hug.send_and_receive(prompt, self.__model).split("\n")[0]
+            ans = ""
+            for i in range(len(results)):
+                ans = results[i]
+                if ans != "":
+                    break
+            if len(ans) > 10:
+                pre = ans[:10]
+                beginInd = ans.find(pre, 1)
+                ans = ans[:beginInd]
+            ans = emoji.demojize(ans)
         else:
             print("VPA app:\n" + prompt + "\n")
-            ans = input("Llama-2-13b:\n")
+            ans = input("Llama-2-70b-hf:\n")
         return ans
 
     # def update_duration_list(self):

@@ -20,18 +20,11 @@ from distutils.version import StrictVersion
 
 class Spider:
     def __init__(self, config_path):
-        proxy_ip = "114.212.82.225"
-        proxy_port = "4411"
-        proxy = Proxy()
-        proxy.proxy_type = ProxyType.MANUAL
-        proxy.http_proxy = f"{proxy_ip}:{proxy_port}"
-        proxy.ssl_proxy = f"{proxy_ip}:{proxy_port}"
         chrome_options = Options()
-        chrome_options.add_argument('--no-sandbox')
+        '''chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument('--disable-dev-shm-usage')
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--proxy-server=http://{}:{}'.format(proxy_ip, proxy_port))
+        chrome_options.add_argument('--headless')'''
         if StrictVersion(selenium.__version__) < StrictVersion("4.0.0"):
             self.web_driver = webdriver.Chrome(options= chrome_options, executable_path=Constant.CHROME_PATH)
         else:

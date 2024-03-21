@@ -14,10 +14,10 @@ import step2_test_skill as test
 def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="1")
-    parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "Llama_chatbot.xlsx")
-    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/llama2_10min/")
-    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/llama2_10min/result/")
-    parser.add_argument("-m", help = "input the LLM", dest = "llm", type = str, default = "Llama2")
+    parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark_stable.xlsx")
+    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../experiemnt/llama2-70b-chat-hf_chatbot_10min/")
+    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../experiment/llama2-70b-chat-hf_chatbot_10min/result/")
+    parser.add_argument("-m", help = "input the LLM", dest = "llm", type = str, default = "LLama2")
     parser.add_argument("-lp", help = "input the path of Llama2", dest = "llmpath", type = str)
     args = parser.parse_args()
     CONFIG_ID = args.id
@@ -86,7 +86,9 @@ if __name__ == '__main__':
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
     if LLM == "Llama2":
-        model, tokenizer = hug.load_model(LLM_PATH)
+        # model, tokenizer = hug.load_model(LLM_PATH)
+        model = hug.connect()
+        tokenizer = None
     else:
         model = None
         tokenizer = None
