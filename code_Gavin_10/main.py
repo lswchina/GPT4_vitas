@@ -98,7 +98,7 @@ if __name__ == '__main__':
     index = 1
     while True:
         skill = Skill(EXCEL_PATH, LOG_PATH, index)
-        if skill.skillName == '<end_of_excel>' or index > 40:
+        if skill.skillName == '<end_of_excel>':# or index > 40:
             break
         if skill.skillName != '':
             skill_log_path = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.skillName))

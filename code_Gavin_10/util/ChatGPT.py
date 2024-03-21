@@ -340,7 +340,10 @@ class askChatGPT:
             hasGlobal3 = False
             self.__getPromptGlobal3()
         promptBody = "Input: " + skill_state_info + "\n"
-        promptBody = promptBody + "Thought:"
+        if self.ablation == "3":
+            promptBody = promptBody + "Output:"
+        else:
+            promptBody = promptBody + "Thought:"
         if hasGlobal3 == False:
             self.__record_result(self.__Step3_Recorder_Path, "User:\n" + self.__promptGlobal3 + promptBody + "\n")
             self.__messageBody3.append({"role": "user", "content": self.__promptGlobal3 + promptBody})
@@ -399,6 +402,7 @@ class askChatGPT:
                     break
         else:
             response = ""
+            select_input = response
         if select_input == '':
             select_input = self.step3_prompt2(response, [], candidate_input_list, self.__messageBody3)
         else:
