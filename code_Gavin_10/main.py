@@ -14,12 +14,12 @@ import step2_test_skill as test
 
 def getArgs():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="1")
+    parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="3")
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark_stable.xlsx")
-    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../experiment/ablation1/")
-    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../experiment/ablation1/result/")
+    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../experiment/ablation3/")
+    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../experiment/ablation3/result/")
     parser.add_argument("-m", help = "input the LLM", dest = "llm", type = str, default = "GPT4")
-    parser.add_argument("-ab", help = "input the ablation study part", dest = "ab", type = str, default = "1")
+    parser.add_argument("-ab", help = "input the ablation study part", dest = "ab", type = str, default = "3")
     parser.add_argument("-lp", help = "input the path of Llama2", dest = "llmpath", type = str)
     args = parser.parse_args()
     CONFIG_ID = args.id
@@ -52,17 +52,17 @@ def init_constant(config_id):
         print("invalid configuration file id")
         sys.exit(-1)
     Constant.LOGOUT_URL = "https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fyourstore%2Fhome%3Fie%3DUTF8%26action%3Dsign-out%26path%3D%252Fgp%252Fyourstore%252Fhome%26ref_%3Dnav_AccountFlyout_signout%26signIn%3D1%26useRedirectOnSuccess%3D1"
-    Constant.CHROME_PATH = os.path.join(os.path.abspath(r".."), "chrome", "chromedriver_new.exe")#"/snap/bin/chromium.chromedriver"
+    Constant.CHROME_PATH = os.path.join(os.path.abspath(r".."), "chrome", "chromedriver_94")#"/snap/bin/chromium.chromedriver"
     Constant.COOKIE_DIR = os.path.join(os.path.abspath(r".."), "cookie", "console_cookie7_" + config_id + ".pkl")
     Constant.WEB = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36'
     Constant.USER_AGENT = {'User-Agent':Constant.WEB,'Host':'www.amazon.com'}
     Constant.RE_DIC = {
-        'alert': f'<div class="a-alert-content">(.*?)</div>',
-        'title': f'<meta name="title" content=(.*?)>',
+        'alert': '<div class="a-alert-content">(.*?)</div>',
+        'title': '<meta name="title" content=(.*?)>',
         'description': '<div data-cy="skill-product-description-see-more" class="sc-kIeTtH dfCbWS">(.*?)</div>',
-        'invocation': f'''<span data-cy="invocation-name-value-detail" font-size="14px" class="sc-eggNIi sc-bsipQr eCEvt hsFSWY">(.*?)</span>''',
-        'permissions': f'<li class="a2s-permissions-list-item">(.*?)</li>',
-        'perm': f'''<span class="a-list-item">
+        'invocation': '''<span data-cy="invocation-name-value-detail" font-size="14px" class="sc-eggNIi sc-bsipQr eCEvt hsFSWY">(.*?)</span>''',
+        'permissions': '<li class="a2s-permissions-list-item">(.*?)</li>',
+        'perm': '''<span class="a-list-item">
             
             
             
@@ -71,7 +71,7 @@ def init_constant(config_id):
         
         
         </span>''',
-        'tit': f'<title>(.*?)</title>'
+        'tit': '<title>(.*?)</title>'
     }
     Constant.TIME_LIMIT = 10 * 60
     Constant.StopSign = ['Stop', 'stop', 'Exit', 'exit', 'cancel', 'Cancel', 'quit', 'Quit']
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     else:
         model = None
         tokenizer = None
-    index = 2
+    index = 46
     while True:
         skill = Skill(EXCEL_PATH, LOG_PATH, index)
         if skill.skillName == '<end_of_excel>':# or index > 40:
@@ -115,4 +115,5 @@ if __name__ == '__main__':
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)
         index = index + 1
+        break
     UI.close_spider(spider)

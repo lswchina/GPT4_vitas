@@ -402,7 +402,13 @@ class askChatGPT:
                     break
         else:
             response = ""
-            select_input = response
+            select_input = response.split("\n")[0]
+            select_input = select_input.strip()
+            select_input = select_input.strip("'")
+            select_input = select_input.strip('"')
+            if select_input not in candidate_input_list:
+                ind = random.randint(0, len(candidate_input_list) - 1)
+                select_input = candidate_input_list[ind]
         if select_input == '':
             select_input = self.step3_prompt2(response, [], candidate_input_list, self.__messageBody3)
         else:
@@ -568,7 +574,13 @@ class askChatGPT:
 
     def __gen_prompt_for_step3(self, states, state, transitions, candidate_Inpt_list, candidate_input_list):
         if self.ablation == "3":
-            return "sentence=" + state, {}
+            prompt = "sentence=" + state + ",input events="
+            for ind, Inpt in enumerate(candidate_Inpt_list):
+                if ind != 0:
+                    prompt = prompt + ","
+                prompt = prompt + '"' + Inpt.get_input() + '"'
+            prompt = prompt + "."
+            return prompt, {}
         candidate_input_set_to_weight = {}
         for i in candidate_input_list:
             candidate_input_set_to_weight[i] = 4
