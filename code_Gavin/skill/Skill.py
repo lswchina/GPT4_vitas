@@ -84,7 +84,7 @@ class Skill:
             for i,invo in enumerate(self.invocation):
                 self.invocation[i] = invo.strip("”")
         self.permission_list = []
-        permissions_list = eval(skillAttri[11].value)
+        permissions_list = []#eval(skillAttri[11].value)
         if isinstance(permissions_list, list):
             for per_dict in permissions_list:
                 self.permission_list.append(per_dict.get('name'))
