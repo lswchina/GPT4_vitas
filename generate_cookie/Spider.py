@@ -117,9 +117,9 @@ class Spider:
                     res1 = re.findall(r'''<td colspan="2" align="left" style="background-color: \#D3D3D3; text-align: left; font-size:20px; font-weight: bold; font-family: 'Amazon Ember', Arial, sans-serif; padding-top: 15px; padding-bottom: 10px; padding-left: 10px; padding-right: 1px; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">(.*?)</td>''', str(bodyContent), re.S)
                     if len(res1) > 0:
                         code = re.findall(r'''<p>(.*?)</p>''', res1[0], re.S)
-                    if len(code) > 0:
-                        pop3Server.quit()
-                        return code[0].strip()
+                        if len(code) > 0:
+                            pop3Server.quit()
+                            return code[0].strip()
         else:
             bodyContent = self.__decodeBody(messageObject)
             if bodyContent:
