@@ -62,7 +62,7 @@ class Skill:
 
     def __parseExcel(self, excelfilename, line):
         excel = openpyxl.load_workbook(excelfilename)
-        sheet = excel.worksheets[0]
+        sheet = excel["dataset"]
         if line >= sheet.max_row:
             self.skillName = '<end_of_excel>'
             return
