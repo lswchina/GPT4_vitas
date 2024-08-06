@@ -1,4 +1,4 @@
-from transformers import LlamaForCausalLM, LlamaConfig,LlamaTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, LlamaForCausalLM, LlamaConfig,LlamaTokenizer
 from accelerate import init_empty_weights,infer_auto_device_map,load_checkpoint_in_model,dispatch_model
 import torch
 import os
@@ -28,9 +28,25 @@ def load_model(model_path):
     tokenizer.pad_token_id = tokenizer.eos_token_id
     return model_16bit, tokenizer
 
+def load_model_local(model_path: str):
+    if not os.path.exists(model_path):
+        model_16bit = AutoModelForCausalLM.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct", torch_dtype=torch.float16)
+        tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B-Instruct")
+        model_16bit.save_pretrained(model_path)
+        tokenizer.save_pretrained(model_path)
+    else:
+        model_16bit = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=torch.float16) #torch_dtype=torch.float16这个很重要
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
+    tokenizer.pad_token_id = tokenizer.eos_token_id
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model_16bit.to(device)
+    return model_16bit, tokenizer
+
 def input_and_output(prompt, model, tokenizer):
     inputs = tokenizer(prompt, return_token_type_ids=False, return_tensors="pt").to(model.device)
-    outputs = model.generate(**inputs, max_new_tokens=max(30, len(inputs)),temperature=0.1)
+    outputs = model.generate(**inputs, 
+                             max_new_tokens=max(30, len(inputs)),
+                             temperature=0.1)
     results = tokenizer.batch_decode(outputs, skip_special_tokens=True)
     result = results[0][len(prompt):]
     return result

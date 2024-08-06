@@ -35,8 +35,8 @@ class askLlama:
         else:
             self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody + "\n")
         if self.__useAPI == True:
-            # state = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
-            state = hug.send_and_receive(prompt, self.__model).split("\n")[0]
+            state = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
+            # state = hug.send_and_receive(prompt, self.__model).split("\n")[0]
         else:
             if hasGlobal1 == False:
                 print("Step1_User:\n" + self.__promptGlobal1 + promptBody + "\n")
@@ -82,8 +82,8 @@ class askLlama:
             promptBody2 = "The state \"" + errorMessage + "\" and sentence " + skill_output + " are semantically similar."
         self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
-            # state2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("\n")[0]
-            results = hug.send_and_receive(promptBody2, self.__model).split("\n")
+            results = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("\n")
+            # results = hug.send_and_receive(promptBody2, self.__model).split("\n")
             state2 = ""
             for i in range(len(results)):
                 state2 = results[i]
@@ -116,12 +116,12 @@ class askLlama:
         else:
             self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody + "\n")
         if self.__useAPI == True:
-            # gpt_response = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")[0]
-            results = hug.send_and_receive(prompt, self.__model).split("\n")
+            results = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("\n")
+            # results = hug.send_and_receive(prompt, self.__model).split("\n")
             gpt_response = ""
             for i in range(len(results)):
                 gpt_response = results[i]
-                if gpt_response != "":
+                if "[" in gpt_response:
                     break
         else:
             if hasGlobal2 == False:
@@ -172,12 +172,12 @@ class askLlama:
                 promptBody2 = promptBody2 + "responses to " + state + "."
         self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
-            # responses2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("\n")[0]
-            results = hug.send_and_receive(promptBody2, self.__model).split("\n")[0]
+            results = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("\n")
+            # results = hug.send_and_receive(promptBody2, self.__model).split("\n")
             responses2 = ""
             for i in range(len(results)):
                 responses2 = results[i]
-                if responses2 != "":
+                if "[" in responses2:
                     break
         else:
             print("Step2_User_2:\n" + promptBody2 + "\n")
@@ -231,8 +231,8 @@ class askLlama:
         else:
             self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody + "\n")
         if self.__useAPI == True:
-            # responses = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("Output: ")
-            responses = hug.send_and_receive(prompt, self.__model).split("Output: ")
+            responses = hug.input_and_output(prompt, self.__model, self.__tokenizer).split("Output: ")
+            # responses = hug.send_and_receive(prompt, self.__model).split("Output: ")
             if len(responses) > 1:
                 response = responses[0] + "Output: " + responses[1].split("\n")[0]
             else:
@@ -369,8 +369,8 @@ class askLlama:
             promptBody2 = promptBody2 + "Please choose another input event from the input event list " + str(candidate_input_list) + "."
         self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
-            # responses2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("Output: ")
-            responses2 = hug.send_and_receive(promptBody2, self.__model).split("Output: ")
+            responses2 = hug.input_and_output(promptBody2, self.__model, self.__tokenizer).split("Output: ")
+            # responses2 = hug.send_and_receive(promptBody2, self.__model).split("Output: ")
             response2 = responses2[0] + "Output: "
             if len(responses2) > 1:
                 response2 += responses2[1].split("\n")[0]
