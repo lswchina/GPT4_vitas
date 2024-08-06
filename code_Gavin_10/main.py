@@ -20,7 +20,7 @@ def getArgs():
     parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../experiment/benchmark_elevate/result/")
     parser.add_argument("-m", help = "input the LLM", dest = "llm", type = str, default = "Llama")
     parser.add_argument("-ab", help = "input the ablation study part", dest = "ab", type = str, default = "0")
-    parser.add_argument("-lp", help = "input the path of Llama2", dest = "llmpath", type = str, default = "../../Meta-Llama-3-8B-Instruct")
+    parser.add_argument("-lp", help = "input the path of Llama", dest = "llmpath", type = str, default = "../../Meta-Llama-3-8B-Instruct")
     args = parser.parse_args()
     CONFIG_ID = args.id
     EXCEL_PATH = os.path.join(os.path.abspath(r".."), "dataset_2022", args.excel_name)
@@ -107,7 +107,7 @@ if __name__ == '__main__':
             else:
                 index = index + 1
                 continue
-            if LLM == "Llama2":
+            if LLM == "Llama":
                 gpt = askLlama(skill.skillName, skill_log_path, True, model, tokenizer)
             else:
                 gpt = askChatGPT(skill.skillName, skill_log_path, True, Constant.CONFIG_PATH, ABLATION_PART)
