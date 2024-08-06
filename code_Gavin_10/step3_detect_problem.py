@@ -63,12 +63,6 @@ def isUnrespondingVUI(lastI, lastRequest, request, spider, FileName):
 
 def privacyLeakage(request, gpt):
     privacy = ['zipcode', 'yourname', 'phonenumber', 'creditcard', 'yourgender', 'yourbirthday', 'identitycard', 'youremail', 'address']
-    # chrome_options = Options()
-    # chrome_options.add_argument('--no-sandbox')
-    # chrome_options.add_argument('--disable-dev-shm-usage')
-    # chrome_options.add_argument('--headless')
-    # s = Service(executable_path=Constant.CHROME_PATH)
-    # driver = webdriver.Chrome(options= chrome_options, service=s)
     output = getAns("", [], [], "", gpt, None)
     for question, speaker in request:
         if speaker == 'Alexa':
