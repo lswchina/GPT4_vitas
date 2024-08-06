@@ -12,7 +12,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.proxy import Proxy, ProxyType
 import util.deal_with_UI as UI
 import util.Constant as Constant
 from distutils.version import StrictVersion
@@ -22,7 +21,6 @@ class Spider:
     def __init__(self, config_path):
         chrome_options = Options()
         chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--headless')
         if StrictVersion(selenium.__version__) < StrictVersion("4.0.0"):
@@ -175,7 +173,6 @@ class Spider:
                 time.sleep(3)
         time.sleep(3)
         # 跳转console页面
-        #print(self.url)
         try:
             self.web_driver.get(self.url)
             time.sleep(15)
@@ -216,6 +213,21 @@ class Spider:
                     self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(Keys.ENTER)
                     time.sleep(2)
                 self.web_driver.get(self.url)
+                time.sleep(2)
+            elif self.web_driver.current_url.startswith("https://www.amazon.com/ap/cvf/"):
+                self.web_driver.get_screenshot_as_file("../../screenshot.png")
+                print("save screen shot!")
+                code = ""
+                while True:
+                    if os.path.exists("../../code.txt"):
+                        with open("../../code.txt", "r", encoding="utf-8") as file:
+                            code = file.read()[:6]
+                        os.remove("../../code.txt")
+                        os.remove("../../screenshot.png")
+                        break
+                    time.sleep(10)
+                self.web_driver.find_element(By.NAME, 'cvf_captcha_input').send_keys(code)
+                self.web_driver.find_element(By.NAME, 'cvf_captcha_input').send_keys(Keys.ENTER)
                 time.sleep(2)
         return
 
@@ -327,7 +339,6 @@ class Spider:
         cookie_file.close()
         self.email_driver.switch_to.default_content()
         name = self.email_driver.find_element(By.ID, "spnUid").text
-        print(name)
         if name == (self.username):
             print('登录成功')
         else:
