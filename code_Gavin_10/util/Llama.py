@@ -131,16 +131,22 @@ class askLlama:
             gpt_response = input("Step2_Llama-2-70b-hf:\n")
         self.__record_result(self.__Step2_Recorder_Path, "Llama-2-70b-hf:\n" + gpt_response + "\n")
         index1 = gpt_response.find("[")
-        index2 = gpt_response.find("]")
-        if index1 != -1 and index2 != -1:
-            response_list = []
-            while index2 != -1:
-                try:
-                    response_list = list(eval(gpt_response[index1: index2 + 1]))
+        if index1 != -1:
+            response_list = None
+            while index1 != -1:
+                index2 = gpt_response.find("]", index1 + 1)
+                if index2 == -1:
                     break
-                except:
-                    index2 = gpt_response.find("]", index2 + 1)
-            if len(response_list) == 1 and response_list[0] == "":
+                while index2 != -1:
+                    try:
+                        response_list = list(eval(gpt_response[index1: index2 + 1]))
+                        break
+                    except:
+                        index2 = gpt_response.find("]", index2 + 1)
+                if response_list != None:
+                    break
+                index1 = gpt_response.find("[", index1 + 1)
+            if response_list == None or (len(response_list) == 1 and response_list[0] == ""):
                 response_list = []
         else:
             response_list = []
@@ -184,10 +190,23 @@ class askLlama:
             responses2 = input("Step2_Llama-2-70b_2:\n")
         self.__record_result(self.__Step2_Recorder_Path, "Llama-2-70b-hf:\n" + responses2 + "\n")
         index1 = responses2.find("[")
-        index2 = responses2.find("]")
-        if index1 != -1 and index2 != -1 and index2 > index1 + 1:
-            responses2 = responses2[index1: index2 + 1]
-            responses2_list = list(eval(responses2))
+        if index1 != -1:
+            response2_list = None
+            while index1 != -1:
+                index2 = responses2.find("]", index1 + 1)
+                if index2 == -1:
+                    break
+                while index2 != -1:
+                    try:
+                        response2_list = list(eval(responses2[index1: index2 + 1]))
+                        break
+                    except:
+                        index2 = responses2.find("]", index2 + 1)
+                if response2_list != None:
+                    break
+                index1 = responses2.find("[", index1 + 1)
+            if response2_list == None or (len(response2_list) == 1 and response2_list[0] == ""):
+                response2_list = []
             if len(responses2_list) > 3 and (Ques.get_quesType() == 3 or Ques.get_quesType() == -1):
                 responses2_list = self.__remove_low_certain(responses2_list)
             return responses2_list
