@@ -207,9 +207,9 @@ class askLlama:
                 index1 = responses2.find("[", index1 + 1)
             if response2_list == None or (len(response2_list) == 1 and response2_list[0] == ""):
                 response2_list = []
-            if len(responses2_list) > 3 and (Ques.get_quesType() == 3 or Ques.get_quesType() == -1):
-                responses2_list = self.__remove_low_certain(responses2_list)
-            return responses2_list
+            if len(response2_list) > 3 and (Ques.get_quesType() == 3 or Ques.get_quesType() == -1):
+                response2_list = self.__remove_low_certain(response2_list)
+            return response2_list
         else:
             return []
 
