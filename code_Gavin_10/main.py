@@ -98,7 +98,7 @@ if __name__ == '__main__':
     index = 1
     while True:
         skill = Skill(EXCEL_PATH, LOG_PATH, index)
-        if skill.skillName == '<end_of_excel>' or index > 1:
+        if skill.skillName == '<end_of_excel>':
             break
         if skill.skillName != '':
             skill_log_path = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.skillName))
@@ -114,5 +114,8 @@ if __name__ == '__main__':
             fsm = FSM(gpt)
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)
-        index = index + 1
+        if index == 1:
+            index = 10
+        else:
+            index = index + 1
     UI.close_spider(spider)
