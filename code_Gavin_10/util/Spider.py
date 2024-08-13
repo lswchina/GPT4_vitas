@@ -121,11 +121,10 @@ class Spider:
             print(self.web_driver.current_url)
             print("open console error!")
             sys.exit()
-        time.sleep(3)
+        time.sleep(30)
         deviceLevel_element = self.web_driver.find_element(By.ID, 'deviceLevel-label')
         self.web_driver.execute_script("arguments[0].click()", deviceLevel_element)
         time.sleep(1)
-        self.__dump_cookie(Constant.COOKIE_DIR, self.web_driver)
         
     def __refresh(self):
         self.web_driver.get(self.home_page)
@@ -234,7 +233,7 @@ class Spider:
             print("wait for getting the current url")
             time.sleep(60)
         time_tmp = time.time()
-        while time.time() - time_tmp < 1*60 and self.web_driver.current_url != self.url:
+        while time.time() - time_tmp < 3*60 and self.web_driver.current_url != self.url:
             try:
                 email = self.web_driver.find_element(By.ID, 'ap_email')
                 email.send_keys(self.username)
@@ -355,7 +354,7 @@ class Spider:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--headless')
-        driver = webdriver.Chrome(options= chrome_options) #, executable_path=Constant.CHROME_PATH)
+        driver = webdriver.Chrome(options= chrome_options, executable_path=Constant.CHROME_PATH)
         driver.get(link)
         time.sleep(5)
         try:
@@ -399,12 +398,31 @@ class Spider:
             return
         self.web_driver.get(self.home_page)
         time.sleep(5)
-        try:
-            log_in_button = self.web_driver.find_element(By.XPATH, '//*[@id="nav-link-accountList"]')
-            self.web_driver.execute_script("arguments[0].click()", log_in_button)
-        except:
-            print(self.web_driver.page_source)
-            print('enter www.amazon.com error!')
+        time_start = time.time()
+        success = False
+        while time.time() - time_start <= 3 * 60:
+            try:
+                log_in_button = self.web_driver.find_element(By.XPATH, '//*[@id="nav-link-accountList"]')
+                self.web_driver.execute_script("arguments[0].click()", log_in_button)
+                success = True
+                break
+            except:
+                self.web_driver.get_screenshot_as_file("../../screenshot.png")
+                print("save enter amazon screen shot!")
+                code = ""
+                while True:
+                    if os.path.exists("../../code.txt"):
+                        with open("../../code.txt", "r", encoding="utf-8") as file:
+                            code = file.read()[:6]
+                        os.remove("../../code.txt")
+                        os.remove("../../screenshot.png")
+                        break
+                    time.sleep(10)
+                self.web_driver.find_element(By.ID, "captchacharacters").send_keys(code)
+                self.web_driver.find_element(By.ID, "captchacharacters").send_keys(Keys.ENTER)
+                time.sleep(5)
+        if success == False:
+            print("enter amazon.com error!")
             sys.exit()
         # self.auto_login()
         time.sleep(2)
@@ -423,6 +441,21 @@ class Spider:
                     time.sleep(2)
                     self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(code)
                     self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(Keys.ENTER)
+            elif self.web_driver.current_url.startswith("https://www.amazon.com/ap/cvf/request?arb="):
+                self.web_driver.get_screenshot_as_file("../../screenshot.png")
+                print("save screen shot!")
+                code = ""
+                while True:
+                    if os.path.exists("../../code.txt"):
+                        with open("../../code.txt", "r", encoding="utf-8") as file:
+                            code = file.read()[:6]
+                        os.remove("../../code.txt")
+                        os.remove("../../screenshot.png")
+                        break
+                    time.sleep(10)
+                self.web_driver.find_element(By.NAME, 'cvf_captcha_input').send_keys(code)
+                self.web_driver.find_element(By.NAME, 'cvf_captcha_input').send_keys(Keys.ENTER)
+                time.sleep(5)
         self.__dump_cookie(Constant.COOKIE_DIR, self.web_driver)
 
     def __if_login(self, url):

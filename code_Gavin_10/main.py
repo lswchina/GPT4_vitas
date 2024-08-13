@@ -14,7 +14,7 @@ import step2_test_skill as test
 
 def getArgs():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="5")
+    parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="3")
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "dataset_Vitas_plus_large.xlsx")
     parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/Elevate_10min/")
     parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/Elevate_10min/result/")
