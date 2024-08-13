@@ -397,7 +397,7 @@ class Spider:
         if os.path.exists(Constant.COOKIE_DIR):
             return
         self.web_driver.get(self.home_page)
-        time.sleep(5)
+        time.sleep(10)
         time_start = time.time()
         success = False
         while time.time() - time_start <= 3 * 60:
