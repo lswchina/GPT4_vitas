@@ -18,7 +18,7 @@ from distutils.version import StrictVersion
 
 
 class Spider:
-    def __init__(self, config_path):
+    def __init__(self, config_path: str):
         chrome_options = Options()
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
@@ -117,6 +117,7 @@ class Spider:
                 self.web_driver.find_element(By.NAME, 'cvf_captcha_input').send_keys(code)
                 self.web_driver.find_element(By.NAME, 'cvf_captcha_input').send_keys(Keys.ENTER)
                 time.sleep(2)
+        
         if not self.web_driver.current_url.startswith(self.url):
             print(self.web_driver.current_url)
             print("open console error!")
@@ -397,7 +398,7 @@ class Spider:
         if os.path.exists(Constant.COOKIE_DIR):
             return
         self.web_driver.get(self.home_page)
-        time.sleep(10)
+        time.sleep(5)
         time_start = time.time()
         success = False
         while time.time() - time_start <= 3 * 60:
@@ -407,20 +408,25 @@ class Spider:
                 success = True
                 break
             except:
-                self.web_driver.get_screenshot_as_file("../../screenshot.png")
-                print("save enter amazon screen shot!")
-                code = ""
-                while True:
-                    if os.path.exists("../../code.txt"):
-                        with open("../../code.txt", "r", encoding="utf-8") as file:
-                            code = file.read()[:6]
-                        os.remove("../../code.txt")
-                        os.remove("../../screenshot.png")
-                        break
-                    time.sleep(10)
-                self.web_driver.find_element(By.ID, "captchacharacters").send_keys(code)
-                self.web_driver.find_element(By.ID, "captchacharacters").send_keys(Keys.ENTER)
-                time.sleep(5)
+                try:
+                    self.web_driver.find_element(By.ID, "captchacharacters")
+                    self.web_driver.get_screenshot_as_file("../../screenshot.png")
+                    print("save enter amazon screen shot!")
+                    code = ""
+                    while True:
+                        if os.path.exists("../../code.txt"):
+                            with open("../../code.txt", "r", encoding="utf-8") as file:
+                                code = file.read()[:6]
+                            os.remove("../../code.txt")
+                            os.remove("../../screenshot.png")
+                            break
+                        time.sleep(10)
+                    self.web_driver.find_element(By.ID, "captchacharacters").send_keys(code)
+                    self.web_driver.find_element(By.ID, "captchacharacters").send_keys(Keys.ENTER)
+                    time.sleep(5)
+                except:
+                    self.web_driver.refresh()
+                    time.sleep(5)
         if success == False:
             print("enter amazon.com error!")
             sys.exit()
