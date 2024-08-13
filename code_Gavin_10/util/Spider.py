@@ -65,12 +65,56 @@ class Spider:
                 passw = self.web_driver.find_element(By.ID, 'ap_password')
                 passw.send_keys(self.password)
                 passw.send_keys(Keys.ENTER)
-                time.sleep(15)
+                time.sleep(2)
                 no_pass = False
             except:
                 no_pass = True
         self.web_driver.get(self.url)
-        time.sleep(15)
+        time.sleep(5)
+        time_tmp = time.time()
+        while time.time() - time_tmp < 3*60 and self.web_driver.current_url != self.url:
+            try:
+                email = self.web_driver.find_element(By.ID, 'ap_email')
+                email.send_keys(self.username)
+                time.sleep(1)
+            except:
+                pass
+            try:
+                passw = self.web_driver.find_element(By.ID, 'ap_password')
+                passw.send_keys(self.password)
+                passw.send_keys(Keys.ENTER)
+                time.sleep(1)
+            except:
+                pass
+            if self.web_driver.current_url.startswith("https://www.amazon.com/ap/cvf/transactionapproval"):
+                code = self.__get_link()
+                print(code)
+                if code != '':
+                    time.sleep(2)
+                    self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(code)
+                    self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(Keys.ENTER)
+                else:
+                    code = input("code:")
+                    self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(code)
+                    self.web_driver.find_element(By.ID, 'input-box-otp').send_keys(Keys.ENTER)
+                    time.sleep(2)
+                self.web_driver.get(self.url)
+                time.sleep(2)
+            elif self.web_driver.current_url.startswith("https://www.amazon.com/ap/cvf/"):
+                self.web_driver.get_screenshot_as_file("../../screenshot.png")
+                print("save screen shot!")
+                code = ""
+                while True:
+                    if os.path.exists("../../code.txt"):
+                        with open("../../code.txt", "r", encoding="utf-8") as file:
+                            code = file.read()[:6]
+                        os.remove("../../code.txt")
+                        os.remove("../../screenshot.png")
+                        break
+                    time.sleep(10)
+                self.web_driver.find_element(By.NAME, 'cvf_captcha_input').send_keys(code)
+                self.web_driver.find_element(By.NAME, 'cvf_captcha_input').send_keys(Keys.ENTER)
+                time.sleep(2)
         if not self.web_driver.current_url.startswith(self.url):
             print(self.web_driver.current_url)
             print("open console error!")
@@ -78,6 +122,7 @@ class Spider:
         deviceLevel_element = self.web_driver.find_element(By.ID, 'deviceLevel-label')
         self.web_driver.execute_script("arguments[0].click()", deviceLevel_element)
         time.sleep(1)
+        self.__dump_cookie(Constant.COOKIE_DIR, self.web_driver)
         
     def __refresh(self):
         self.web_driver.get(self.home_page)
