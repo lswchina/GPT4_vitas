@@ -119,6 +119,7 @@ class Spider:
             print(self.web_driver.current_url)
             print("open console error!")
             sys.exit()
+        time.sleep(3)
         deviceLevel_element = self.web_driver.find_element(By.ID, 'deviceLevel-label')
         self.web_driver.execute_script("arguments[0].click()", deviceLevel_element)
         time.sleep(1)
