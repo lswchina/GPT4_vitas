@@ -1,8 +1,9 @@
+import os
 from copy import deepcopy
 from util.NLP import NLP
 import util.Constant as Constant
 class FSM():
-    def __init__(self, gpt):
+    def __init__(self, gpt, skill_log_path):
         self.__stateToInfo = {}
         self.__stateToInfoTemp = {}
         self.__find_last_state = {}
@@ -11,6 +12,7 @@ class FSM():
         self.__QuesSet = set()
         self.__transitions = {}
         self.__gpt = gpt
+        self.__record_path = os.path.join(skill_log_path, "ques_state.txt")
 
     def addInputs(self, Ques, sysAns, helpAns, contextAns):
         Ques.addContextInputs(contextAns)
@@ -103,6 +105,8 @@ class FSM():
             #ques is processed before
             if lastQ != None:
                 lastQ.addReward(-1)
+        
+        self.__record(Ques.get_ques(), state)
         
         #check rule1, add info of last_state to FSM
         if self.__stateToInfoTemp.get(last_state, None) != None:
@@ -269,3 +273,8 @@ class FSM():
             self.__transitions[last_state] = transition_of_last_state
         lastQ.addContextInputs(context_related_inputs_after)
         lastQ.addGPTTimes()
+
+    def __record(self, ques, state):
+        with open(self.__record_path, "a+") as file:
+            file.write(ques + "\t" + state)
+            file.close()
