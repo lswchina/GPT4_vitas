@@ -276,5 +276,5 @@ class FSM():
 
     def __record(self, ques, state):
         with open(self.__record_path, "a+") as file:
-            file.write(ques + "\t" + state)
+            file.write(ques + "\t" + state + "\n")
             file.close()
