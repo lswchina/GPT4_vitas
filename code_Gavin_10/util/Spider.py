@@ -57,6 +57,7 @@ class Spider:
             try:
                 email = self.web_driver.find_element(By.ID, 'ap_email')
                 email.send_keys(self.username)
+                email.send_keys(Keys.ENTER)
                 time.sleep(1)
                 no_email = False
             except:
@@ -76,6 +77,7 @@ class Spider:
             try:
                 email = self.web_driver.find_element(By.ID, 'ap_email')
                 email.send_keys(self.username)
+                email.send_keys(Keys.ENTER)
                 time.sleep(1)
             except:
                 pass
@@ -236,6 +238,7 @@ class Spider:
             try:
                 email = self.web_driver.find_element(By.ID, 'ap_email')
                 email.send_keys(self.username)
+                email.send_keys(Keys.ENTER)
                 time.sleep(1)
             except:
                 pass
