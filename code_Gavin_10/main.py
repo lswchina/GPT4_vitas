@@ -16,8 +16,8 @@ def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="5")
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "dataset_Vitas_plus_large.xlsx")
-    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/benchmark_elevate/")
-    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/benchmark_elevate/result/")
+    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/Elevate_10min/")
+    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/Elevate_10min/result/")
     parser.add_argument("-m", help = "input the LLM", dest = "llm", type = str, default = "Llama")
     parser.add_argument("-ab", help = "input the ablation study part", dest = "ab", type = str, default = "0")
     parser.add_argument("-lp", help = "input the path of Llama", dest = "llmpath", type = str, default = "../../Meta-Llama-3-8B-Instruct")
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     index = 1
     while True:
         skill = Skill(EXCEL_PATH, LOG_PATH, index)
-        if skill.skillName == '<end_of_excel>':
+        if skill.skillName == '<end_of_excel>' or index > 26:
             break
         if skill.skillName != '':
             skill_log_path = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.skillName))
@@ -114,8 +114,5 @@ if __name__ == '__main__':
             fsm = FSM(gpt, skill_log_path)
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)
-        if index == 1:
-            index = 10
-        else:
-            index = index + 1
+        index = index + 1
     UI.close_spider(spider)
