@@ -95,10 +95,10 @@ if __name__ == '__main__':
     else:
         model = None
         tokenizer = None
-    index = 1
+    index = 24
     while True:
         skill = Skill(EXCEL_PATH, LOG_PATH, index)
-        if skill.skillName == '<end_of_excel>' or index > 26:
+        if skill.skillName == '<end_of_excel>':
             break
         if skill.skillName != '':
             skill_log_path = os.path.join(LOG_PATH, re.sub(r'(\W+)', '_', skill.skillName))
