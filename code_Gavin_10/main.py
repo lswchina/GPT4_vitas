@@ -95,7 +95,7 @@ if __name__ == '__main__':
     else:
         model = None
         tokenizer = None
-    index = 104
+    index = 1
     while True:
         skill = Skill(EXCEL_PATH, LOG_PATH, index)
         if skill.skillName == '<end_of_excel>':
@@ -115,5 +115,4 @@ if __name__ == '__main__':
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)
         index = index + 1
-        break
     UI.close_spider(spider)
