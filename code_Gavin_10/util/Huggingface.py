@@ -45,7 +45,7 @@ def load_model_local(model_path: str):
 def input_and_output(prompt, model, tokenizer):
     inputs = tokenizer(prompt, return_token_type_ids=False, return_tensors="pt").to(model.device)
     outputs = model.generate(**inputs, 
-                             max_new_tokens=max(30, len(inputs)),
+                             max_new_tokens=max(100, len(inputs)),
                              temperature=0.1)
     results = tokenizer.batch_decode(outputs, skip_special_tokens=True)
     result = results[0][len(prompt):]
