@@ -97,7 +97,7 @@ if __name__ == '__main__':
         tokenizer = None
     # index = 1
     # while True:
-    for index in [13, 15, 30, 38, 88, 102, 108]:
+    for index in [15, 30, 38, 88, 108]:
         skill = Skill(EXCEL_PATH, LOG_PATH, index)
         if skill.skillName == '<end_of_excel>':
             break
