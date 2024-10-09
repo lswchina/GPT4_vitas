@@ -95,9 +95,8 @@ if __name__ == '__main__':
     else:
         model = None
         tokenizer = None
-    # index = 1
-    # while True:
-    for index in [15, 108]:
+    index = 1
+    while True:
         skill = Skill(EXCEL_PATH, LOG_PATH, index)
         if skill.skillName == '<end_of_excel>':
             break
@@ -106,7 +105,7 @@ if __name__ == '__main__':
             if not os.path.exists(skill_log_path):
                 os.makedirs(skill_log_path)
             else:
-                # index = index + 1
+                index = index + 1
                 continue
             if LLM == "Llama":
                 gpt = askLlama(skill.skillName, skill_log_path, True, model, tokenizer)
@@ -115,5 +114,5 @@ if __name__ == '__main__':
             fsm = FSM(gpt, skill_log_path)
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)
-        # index = index + 1
+        index = index + 1
     UI.close_spider(spider)
