@@ -158,9 +158,9 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
                     if Stop == False:
                         log += "problem1----------unexpected exit!(" + str(rounds) + ")\n"
                         addProblem(os.path.join(res_dir, "problem1.txt"), skill.skillName)
-                    else:
-                        log += "problem3----------unstoppable skill!(" + str(rounds) + ")\n"
-                        addProblem(os.path.join(res_dir, "problem3.txt"), skill.skillName)
+                    # else:
+                    #     log += "problem3----------unstoppable skill!(" + str(rounds) + ")\n"
+                    #     addProblem(os.path.join(res_dir, "problem3.txt"), skill.skillName)
             elif pro_detc.isCrash(lastRequest, request):      #problem 1: unexpected exit
                 log += "problem1----------unexpected exit!(" + str(rounds) + ")\n"
                 addProblem(os.path.join(res_dir, "problem1.txt"), skill.skillName)
