@@ -508,7 +508,10 @@ class askChatGPT:
 
     def step3_prompt2(self, inpt, better_inputs, candidate_input_list, messageBody):
         if self.ablation == "3" or self.delete_feedback:
-            return inpt
+            if inpt not in candidate_input_list:
+                return random.choice(candidate_input_list)
+            else:
+                return inpt
         cf = configparser.ConfigParser()
         cf.read(self.__config_path)
         openai.api_type = "azure"
