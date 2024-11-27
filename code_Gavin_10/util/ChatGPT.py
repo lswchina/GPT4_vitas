@@ -5,7 +5,7 @@ import random
 from copy import deepcopy
 
 class askChatGPT:
-    def __init__(self, skillName, log_dir, useAPI, config_path, ablation):
+    def __init__(self, skillName, log_dir, useAPI, config_path, ablation, delete_feedback):
         self.skillName = skillName
         if log_dir != "":
             self.__Step1_Recorder_Path = os.path.join(log_dir, "step1_findState.txt")
@@ -30,6 +30,7 @@ class askChatGPT:
         ]
         self.__config_path = config_path
         self.ablation = ablation
+        self.delete_feedback = delete_feedback
 
     def step1_chat(self, skill_output, state_list):
         cf = configparser.ConfigParser()
@@ -109,7 +110,7 @@ class askChatGPT:
         return self.__promptGlobal1
 
     def step1_prompt2(self, state, skill_output, state_list, errorMessage, messageBody):
-        if self.ablation == "1":
+        if self.ablation == "1" or self.delete_feedback:
             return skill_output
         cf = configparser.ConfigParser()
         cf.read(self.__config_path)
@@ -223,7 +224,7 @@ class askChatGPT:
         return response_list
             
     def step2_prompt2(self, inpt, Ques, context_related_inputs, type, state, nouns):
-        if self.ablation == "2":
+        if self.ablation == "2" or self.delete_feedback:
             return context_related_inputs
         cf = configparser.ConfigParser()
         cf.read(self.__config_path)
@@ -420,7 +421,7 @@ class askChatGPT:
         return select_input
 
     def __find_better_inputs(self, candidate_input_set_to_weight, candidate_Inpt_list, select_input):
-        if self.ablation == "3":
+        if self.ablation == "3" or self.delete_feedback:
             return []
         better_inputs = []
         weight_of_select_input = candidate_input_set_to_weight[select_input]
@@ -506,7 +507,7 @@ class askChatGPT:
         return self.__promptGlobal3
 
     def step3_prompt2(self, inpt, better_inputs, candidate_input_list, messageBody):
-        if self.ablation == "3":
+        if self.ablation == "3" or self.delete_feedback:
             return inpt
         cf = configparser.ConfigParser()
         cf.read(self.__config_path)
