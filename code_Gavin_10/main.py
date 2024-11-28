@@ -116,7 +116,7 @@ if __name__ == '__main__':
                 gpt = askLlama(skill.skillName, skill_log_path, True, model, tokenizer)
             else:
                 gpt = askChatGPT(skill.skillName, skill_log_path, True, Constant.CONFIG_PATH, ABLATION_PART, DELETE_FEEDBACK)
-            fsm = FSM(gpt, skill_log_path)
+            fsm = FSM(gpt, skill_log_path, skill.getBascComds())
             test.generateTest(skill_log_path, RESULT_PATH, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)
         index = index + 1

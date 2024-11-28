@@ -3,7 +3,7 @@ from copy import deepcopy
 from util.NLP import NLP
 import util.Constant as Constant
 class FSM():
-    def __init__(self, gpt, skill_log_path):
+    def __init__(self, gpt, skill_log_path, basicComds):
         self.__stateToInfo = {}
         self.__stateToInfoTemp = {}
         self.__find_last_state = {}
@@ -12,6 +12,7 @@ class FSM():
         self.__QuesSet = set()
         self.__transitions = {}
         self.__gpt = gpt
+        self.__basicComds = basicComds
         self.__record_path = os.path.join(skill_log_path, "ques_state.txt")
 
     def addInputs(self, Ques, sysAns, helpAns, contextAns):
@@ -266,6 +267,7 @@ class FSM():
                 nouns = NLP.getNoneOfIQ(last_ques)
             context_related_inputs_after = self.__gpt.step2_prompt2(lastI.get_input(), lastQ, context_related_inputs, type_, last_state, nouns)
         context_related_inputs_delete = set(context_related_inputs).difference(set(context_related_inputs_after))
+        context_related_inputs_delete = context_related_inputs_delete.difference(set(self.__basicComds))
         transition_of_last_state = self.__transitions.get(last_state, None)
         if transition_of_last_state != None:
             for inpt_del in context_related_inputs_delete:
