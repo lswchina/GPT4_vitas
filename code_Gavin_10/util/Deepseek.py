@@ -59,7 +59,8 @@ class askDeepseek:
                         max_tokens = 200
                     )
                     state = str(responseBody.choices[0].message.content)
-                    break
+                    if state != "" and state != "\n":
+                        break
                 except Exception as e:
                     print(e)
         else:
@@ -131,7 +132,8 @@ class askDeepseek:
                         max_tokens = 250
                     )
                     state2 = str(responseBody.choices[0].message.content)
-                    break
+                    if state2 != "" and state2 != "\n":
+                        break
                 except Exception as e:
                     print(e)
         else:
@@ -176,7 +178,8 @@ class askDeepseek:
                         max_tokens = 300
                     )
                     gpt_response = str(responseBody.choices[0].message.content)
-                    break
+                    if gpt_response != "" and gpt_response != "\n":
+                        break
                 except Exception as e:
                     print(e)
         else:
@@ -259,7 +262,8 @@ class askDeepseek:
                         max_tokens = 350
                     )
                     responses2 = str(responseBody.choices[0].message.content)
-                    break
+                    if responses2 != "" and responses2 != "\n":
+                        break
                 except Exception as e:
                     print(e)
         else:
@@ -340,7 +344,8 @@ class askDeepseek:
                         max_tokens = 400
                     )
                     response = str(responseBody.choices[0].message.content)
-                    break
+                    if response != "" and response != "\n":
+                        break
                 except Exception as e:
                     print(e)
         else:
@@ -513,7 +518,8 @@ class askDeepseek:
                         max_tokens = 450
                     )
                     response2 = str(responseBody.choices[0].message.content)
-                    break
+                    if response2 != "" and response2 != "\n":
+                        break
                 except Exception as e:
                     print(e)
         else:
