@@ -68,6 +68,7 @@ class askDeepseek:
             else:
                 print("Step1_User:\n" + promptBody + "\n")
             state = input("Step1_Deepseek:\n")
+        state = state.split("\n")[0]
         state = state.strip('"')
         state = state.strip("'")
         self.__record_result(self.__Step1_Recorder_Path, "Deepseek:\n" + state + "\n")
