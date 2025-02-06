@@ -1,6 +1,6 @@
 spacy
 selenium
-openai==0.28
+openai==1.7.0
 openpyxl
 np
 transformers
