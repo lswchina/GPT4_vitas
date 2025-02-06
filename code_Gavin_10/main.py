@@ -6,6 +6,7 @@ from model.FSM import FSM
 import util.deal_with_UI as UI
 from util.Spider import Spider
 from util.ChatGPT import askChatGPT
+from util.Deepseek import askDeepseek
 from util.Llama import askLlama
 import util.Constant as Constant
 import util.Huggingface as hug
@@ -16,11 +17,11 @@ def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="1")
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "benchmark_stable.xlsx")
-    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/GPT4_behavior_10min/")
-    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/GPT4_behavior_10min/result/")
-    parser.add_argument("-m", help = "input the LLM", dest = "llm", type = str, default = "GPT-4")
+    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/elevate_deepseek_10min/")
+    parser.add_argument("-o", help = "input the path to save results", dest = "res_path", type = str, default = "../../output/elevate_deepseek_10min/result/")
+    parser.add_argument("-m", help = "input the LLM", dest = "llm", type = str, default = "Deepseek")
     parser.add_argument("-ab", help = "input the ablation study part", dest = "ab", type = str, default = "0")
-    parser.add_argument("-fb", help = "input t/f to delete the feedback", dest = "fb", type = str, default = "t")
+    parser.add_argument("-fb", help = "input t/f to delete the feedback", dest = "fb", type = str, default = "f")
     parser.add_argument("-lp", help = "input the path of Llama", dest = "llmpath", type = str, default = "../../Meta-Llama-3-8B-Instruct")
     args = parser.parse_args()
     CONFIG_ID = args.id
@@ -114,6 +115,8 @@ if __name__ == '__main__':
                 continue
             if LLM == "Llama":
                 gpt = askLlama(skill.skillName, skill_log_path, True, model, tokenizer)
+            elif LLM == "Deepseek":
+                gpt = askDeepseek(skill.skillName, skill_log_path, True, Constant.CONFIG_PATH, ABLATION_PART, DELETE_FEEDBACK)
             else:
                 gpt = askChatGPT(skill.skillName, skill_log_path, True, Constant.CONFIG_PATH, ABLATION_PART, DELETE_FEEDBACK)
             fsm = FSM(gpt, skill_log_path, skill.getBascComds())
