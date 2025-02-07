@@ -26,13 +26,13 @@ def ansAlexa(output, questions):
     ans = output.getResponse(questions)
     return ans
     
-def ansSkill(output, request, time_before_testing):
+def ansSkill(output, request, time_before_testing, all_rounds):
     questions = ""
     for req in request:
         if req[1] != 'Alexa':
             questions = req[0]
             break
-    if time.time() - time_before_testing >= Constant.TIME_LIMIT:
+    if all_rounds >= 20 - 1: #time.time() - time_before_testing >= Constant.TIME_LIMIT:
         return "stop"
     else:
         return output.getResponse(questions)
@@ -55,7 +55,8 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt):
     endWithStop = False
     i = 0
     time_before_testing = time.time()
-    while time.time() - time_before_testing < Constant.TIME_LIMIT:
+    total_rounds = 0
+    while total_rounds < 20: #time.time() - time_before_testing < Constant.TIME_LIMIT:
         time_start = time.time()
         fileTest = os.path.join(skill_log_path, skillName_to_dirName + str(i) + ".txt")
         log = ''
@@ -76,11 +77,11 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt):
             if result[0] == True:
                 if result[1] != 'region':
                     if rounds == 0 and result[1] != "":
-                        log += "problem4----------unexpected skills started!\n"
+                        log += "problem4----------unexpected skills started!(" + str(total_rounds + rounds) + ")\n"
                         addProblem(os.path.join(res_dir, "problem4.txt"), skill.skillName + ": " + result[1])
                         skillStart = True
                     else:
-                        log += "problem5----------unavailable skill!\n"
+                        log += "problem5----------unavailable skill!(" + str(total_rounds + rounds) + ")\n"
                         addProblem(os.path.join(res_dir, "problem5.txt"), skill.skillName)
                 Stop = True
                 break
@@ -89,7 +90,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt):
             if skillStart == True:
                 result = pro_detc.privacyLeakage(request)            #problem 2: privacy violation
                 if result[0]:
-                    log += "problem2----------privacy violation!\n"
+                    log += "problem2----------privacy violation!(" + str(total_rounds + rounds) + ")\n"
                     if len(skill.permission_list) == 0:
                         addProblem(os.path.join(res_dir, "problem2.txt"), skill.skillName + ": " + result[1])
                     else:
@@ -115,10 +116,10 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt):
         if rounds >= 4:
             Stop = True
 
-        rounds = 0
+        rounds = 1
         while Stop == False:
             skillStart = True
-            inpt = ansSkill(output, request, time_before_testing)
+            inpt = ansSkill(output, request, time_before_testing, total_rounds + rounds)
             print(inpt)
             if inpt in Constant.StopSign:
                 Stop = True
@@ -136,23 +137,23 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt):
             if p1:
                 if type == 1:
                     if Stop == False:
-                        log += "problem1----------unexpected exit!\n"
+                        log += "problem1----------unexpected exit!(" + str(total_rounds + rounds) + ")\n"
                         addProblem(os.path.join(res_dir, "problem1.txt"), skill.skillName)
                 elif type == 2:
                     if Stop == False:
-                        log += "problem1----------unexpected exit!\n"
+                        log += "problem1----------unexpected exit!(" + str(total_rounds + rounds) + ")\n"
                         addProblem(os.path.join(res_dir, "problem1.txt"), skill.skillName)
                     else:
-                        log += "problem3----------unstoppable skill!\n"
+                        log += "problem3----------unstoppable skill!(" + str(total_rounds + rounds) + ")\n"
                         addProblem(os.path.join(res_dir, "problem3.txt"), skill.skillName)
             elif pro_detc.isCrash(lastRequest, request):      #problem 1: unexpected exit
-                log += "problem1----------unexpected exit!\n"
+                log += "problem1----------unexpected exit!(" + str(total_rounds + rounds) + ")\n"
                 addProblem(os.path.join(res_dir, "problem1.txt"), skill.skillName)
                 p1 = True
             else:
                 p2, privacy = pro_detc.privacyLeakage(request)            #problem 2: privacy violation
                 if p2:
-                    log += "problem2----------privacy violation!\n"
+                    log += "problem2----------privacy violation!(" + str(total_rounds + rounds) + ")\n"
                     if len(skill.permission_list) == 0:
                         addProblem(os.path.join(res_dir, "problem2.txt"), skill.skillName + ": " + privacy)
                     else:
@@ -170,10 +171,10 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt):
             i = 0
             continue
         if pro_detc.isUnstoppable(spider, inpt, fileTest):   #problem 3: unstoppable skill
-            log += "problem3----------unstoppable skill!\n"
+            log += "problem3----------unstoppable skill!(" + str(total_rounds + rounds) + ")\n"
             addProblem(os.path.join(res_dir, "problem3.txt"), skill.skillName)
         if 'problem5' not in log and pro_detc.isUnavailable(skillStart, NLP.splitSentence(questions), skill.supportRegion):   #problem 5: unavailable skill
-            log += "problem5----------unavailable skill!\n"
+            log += "problem5----------unavailable skill!(" + str(total_rounds + rounds) + ")\n"
             addProblem(os.path.join(res_dir, "problem5.txt"), skill.skillName)
         with open(fileTest, "a") as file:
             file.write("\n\nlog:\n")
@@ -188,6 +189,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt):
         if 'problem4' in log or 'problem5' in log:
             return
         i = i + 1
+        total_rounds += rounds
 
 
 
