@@ -35,9 +35,13 @@ class askDeepseek:
         self.apk_key = os.getenv("DEEPSEEK_API_KEY")
 
 
+    def retry_if_result_empty(result):
+        return result == "" or result == None
+
     @retry(
-        stop=stop_after_attempt(3),  # 最多重试 3 次
-        wait=wait_exponential(multiplier=1, min=4, max=10)  # 指数退避
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10),
+        retry = retry_if_result_empty
     )
     def __query(self, messageBody, tempr, maxt):
         client = OpenAI(api_key = self.apk_key, base_url = "https://api.deepseek.com")
@@ -50,12 +54,10 @@ class askDeepseek:
                 timeout = 60
             )
             result = response.choices[0].message.content.strip()
-            if not result:
-                raise Exception("Empty response received")
             return result
         except Exception as e:
-            print(f"Deepseek query API error: {str(e)}")
-            raise
+            print(f"Deepseek query error: {str(e)}")
+        return ''
 
     def step1_chat(self, skill_output, state_list):
         hasGlobal1 = True
