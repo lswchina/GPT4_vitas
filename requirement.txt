@@ -7,3 +7,4 @@ np
 transformers
 accelerate
 emoji
+tenacity

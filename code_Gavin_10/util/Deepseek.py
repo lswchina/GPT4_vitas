@@ -1,8 +1,9 @@
 import os
-import configparser
 from openai import OpenAI
 import random
 from copy import deepcopy
+from openai import OpenAI
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 class askDeepseek:
     def __init__(self, skillName, log_dir, useAPI, config_path, ablation, delete_feedback):
@@ -33,6 +34,29 @@ class askDeepseek:
         self.delete_feedback = delete_feedback
         self.apk_key = os.getenv("DEEPSEEK_API_KEY")
 
+
+    @retry(
+        stop=stop_after_attempt(3),  # 最多重试 3 次
+        wait=wait_exponential(multiplier=1, min=4, max=10)  # 指数退避
+    )
+    def __query(self, messageBody, tempr, maxt):
+        client = OpenAI(api_key = self.apk_key, base_url = "https://api.deepseek.com")
+        try:
+            response = client.chat.completions.create(
+                model = "deepseek-chat",
+                messages = messageBody,
+                temperature = tempr,
+                max_tokens = maxt,
+                timeout = 60
+            )
+            result = response.choices[0].message.content.strip()
+            if not result:
+                raise Exception("Empty response received")
+            return result
+        except Exception as e:
+            print(f"Deepseek query API error: {str(e)}")
+            raise
+
     def step1_chat(self, skill_output, state_list):
         hasGlobal1 = True
         if self.__promptGlobal1 == "":
@@ -47,22 +71,7 @@ class askDeepseek:
             self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody + "\n")
             self.__messageBody1.append({"role": "user", "content": promptBody})
         if self.__useAPI == True:
-            state = ''
-            client = OpenAI(api_key = self.apk_key, base_url = "https://api.deepseek.com")
-            for i in range(3):
-                # self.update_duration_list()
-                try:
-                    responseBody = client.chat.completions.create(
-                        model = "deepseek-chat",
-                        messages = self.__messageBody1,
-                        temperature = 0.1,
-                        max_tokens = 200
-                    )
-                    state = str(responseBody.choices[0].message.content)
-                    if state != "" and state != "\n":
-                        break
-                except Exception as e:
-                    print(e)
+            state = self.__query(self.__messageBody1, 0.1, 200)
         else:
             if hasGlobal1 == False:
                 print("Step1_User:\n" + self.__promptGlobal1 + promptBody + "\n")
@@ -120,22 +129,7 @@ class askDeepseek:
         self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
             messageBody.append({"role": "user", "content": promptBody2})
-            state2 = ''
-            client = OpenAI(api_key = self.apk_key, base_url = "https://api.deepseek.com")
-            for i in range(3):
-                # self.update_duration_list()
-                try:
-                    responseBody = client.chat.completions.create(
-                        model = "deepseek-chat",
-                        messages = messageBody,
-                        temperature = 0,
-                        max_tokens = 250
-                    )
-                    state2 = str(responseBody.choices[0].message.content)
-                    if state2 != "" and state2 != "\n":
-                        break
-                except Exception as e:
-                    print(e)
+            state2 = self.__query(messageBody, 0, 250)
         else:
             print("Step1_User_2:\n" + promptBody2)
             state2 = input("Step1_Deepseek_2:\n")
@@ -166,22 +160,7 @@ class askDeepseek:
             self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody + "\n")
             self.__messageBody2.append({"role": "user", "content": promptBody})
         if self.__useAPI == True:
-            gpt_response = ''
-            client = OpenAI(api_key = self.apk_key, base_url = "https://api.deepseek.com")
-            for i in range(3):
-                # self.update_duration_list()
-                try:
-                    responseBody = client.chat.completions.create(
-                        model = "deepseek-chat",
-                        messages = self.__messageBody2,
-                        temperature = 0,
-                        max_tokens = 300
-                    )
-                    gpt_response = str(responseBody.choices[0].message.content)
-                    if gpt_response != "" and gpt_response != "\n":
-                        break
-                except Exception as e:
-                    print(e)
+            gpt_response = self.__query(self.__messageBody2, 0, 300)
         else:
             if hasGlobal2 == False:
                 print("Step2_User:\n" + self.__promptGlobal2 + promptBody + "\n")
@@ -250,22 +229,7 @@ class askDeepseek:
         self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
             messageBody.append({"role": "user", "content": promptBody2})
-            responses2 = ''
-            client = OpenAI(api_key = self.apk_key, base_url = "https://api.deepseek.com")
-            for i in range(3):
-                # self.update_duration_list()
-                try:
-                    responseBody = client.chat.completions.create(
-                        model = "deepseek-chat",
-                        messages = messageBody,
-                        temperature = 0,
-                        max_tokens = 350
-                    )
-                    responses2 = str(responseBody.choices[0].message.content)
-                    if responses2 != "" and responses2 != "\n":
-                        break
-                except Exception as e:
-                    print(e)
+            responses2 = self.__query(messageBody, 0, 350)
         else:
             print("Step2_User_2:\n" + promptBody2 + "\n")
             responses2 = input("Step2_Deepseek_2:\n")
@@ -332,22 +296,7 @@ class askDeepseek:
             self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody + "\n")
             self.__messageBody3.append({"role": "user", "content": promptBody})
         if self.__useAPI == True:
-            response = ''
-            client = OpenAI(api_key = self.apk_key, base_url = "https://api.deepseek.com")
-            for i in range(3):
-                # self.update_duration_list()
-                try:
-                    responseBody = client.chat.completions.create(
-                        model = "deepseek-chat",
-                        messages = self.__messageBody3,
-                        temperature = 0,
-                        max_tokens = 400
-                    )
-                    response = str(responseBody.choices[0].message.content)
-                    if response != "" and response != "\n":
-                        break
-                except Exception as e:
-                    print(e)
+            response = self.__query(self.__messageBody3, 0, 400)
         else:
             if hasGlobal3 == False:
                 print("Step3_User:\n" + self.__promptGlobal3 + promptBody + "\n")
@@ -506,22 +455,7 @@ class askDeepseek:
         self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
             messageBody.append({"role": "user", "content": promptBody2})
-            response2 = ''
-            client = OpenAI(api_key = self.apk_key, base_url = "https://api.deepseek.com")
-            for i in range(3):
-                # self.update_duration_list()
-                try:
-                    responseBody = client.chat.completions.create(
-                        model = "deepseek-chat",
-                        messages = messageBody,
-                        temperature = 0,
-                        max_tokens = 450
-                    )
-                    response2 = str(responseBody.choices[0].message.content)
-                    if response2 != "" and response2 != "\n":
-                        break
-                except Exception as e:
-                    print(e)
+            response2 = self.__query(messageBody, 0, 450)
         else:
             print("Step3_User_2:\n" + promptBody2 + "\n")
             response2 = input("Step3_Deepseek_2:\n")
