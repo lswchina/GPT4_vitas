@@ -1,9 +1,11 @@
 from openai import OpenAI
+import os
 
 class askDeepseek:
     def __init__(self, skillName, useAPI):
         self.skillName = skillName
         self.__useAPI = useAPI
+        self.apk_key = os.getenv("DEEPSEEK_API_KEY")
 
     def test(self, prompt):
         messageBody = [
