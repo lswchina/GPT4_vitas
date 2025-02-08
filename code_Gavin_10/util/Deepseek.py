@@ -3,7 +3,7 @@ from openai import OpenAI
 import random
 from copy import deepcopy
 from openai import OpenAI
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_result
 
 class askDeepseek:
     def __init__(self, skillName, log_dir, useAPI, config_path, ablation, delete_feedback):
@@ -41,7 +41,7 @@ class askDeepseek:
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=10),
-        retry = retry_if_result_empty
+        retry = retry_if_result(retry_if_result_empty)
     )
     def __query(self, messageBody, tempr, maxt):
         client = OpenAI(api_key = self.apk_key, base_url = "https://api.deepseek.com")
@@ -73,7 +73,10 @@ class askDeepseek:
             self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody + "\n")
             self.__messageBody1.append({"role": "user", "content": promptBody})
         if self.__useAPI == True:
-            state = self.__query(self.__messageBody1, 0.1, 200)
+            try:
+                state = self.__query(self.__messageBody1, 0.1, 200)
+            except:
+                state = ''
         else:
             if hasGlobal1 == False:
                 print("Step1_User:\n" + self.__promptGlobal1 + promptBody + "\n")
@@ -131,7 +134,10 @@ class askDeepseek:
         self.__record_result(self.__Step1_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
             messageBody.append({"role": "user", "content": promptBody2})
-            state2 = self.__query(messageBody, 0, 250)
+            try:
+                state2 = self.__query(messageBody, 0, 250)
+            except:
+                state2 = ''
         else:
             print("Step1_User_2:\n" + promptBody2)
             state2 = input("Step1_Deepseek_2:\n")
@@ -162,7 +168,10 @@ class askDeepseek:
             self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody + "\n")
             self.__messageBody2.append({"role": "user", "content": promptBody})
         if self.__useAPI == True:
-            gpt_response = self.__query(self.__messageBody2, 0, 300)
+            try:
+                gpt_response = self.__query(self.__messageBody2, 0, 300)
+            except:
+                gpt_response = ''
         else:
             if hasGlobal2 == False:
                 print("Step2_User:\n" + self.__promptGlobal2 + promptBody + "\n")
@@ -231,7 +240,10 @@ class askDeepseek:
         self.__record_result(self.__Step2_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
             messageBody.append({"role": "user", "content": promptBody2})
-            responses2 = self.__query(messageBody, 0, 350)
+            try:
+                responses2 = self.__query(messageBody, 0, 350)
+            except:
+                responses2 = ''
         else:
             print("Step2_User_2:\n" + promptBody2 + "\n")
             responses2 = input("Step2_Deepseek_2:\n")
@@ -298,7 +310,10 @@ class askDeepseek:
             self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody + "\n")
             self.__messageBody3.append({"role": "user", "content": promptBody})
         if self.__useAPI == True:
-            response = self.__query(self.__messageBody3, 0, 400)
+            try:
+                response = self.__query(self.__messageBody3, 0, 400)
+            except:
+                response = ''
         else:
             if hasGlobal3 == False:
                 print("Step3_User:\n" + self.__promptGlobal3 + promptBody + "\n")
@@ -457,7 +472,10 @@ class askDeepseek:
         self.__record_result(self.__Step3_Recorder_Path, "User:\n" + promptBody2 + "\n")
         if self.__useAPI == True:
             messageBody.append({"role": "user", "content": promptBody2})
-            response2 = self.__query(messageBody, 0, 450)
+            try:
+                response2 = self.__query(messageBody, 0, 450)
+            except:
+                response2 = ''
         else:
             print("Step3_User_2:\n" + promptBody2 + "\n")
             response2 = input("Step3_Deepseek_2:\n")
