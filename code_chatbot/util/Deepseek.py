@@ -1,6 +1,7 @@
 from openai import OpenAI
 import os
-from tenacity import retry, stop_after_attempt, wait_exponential
+import emoji
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_result
 
 class askDeepseek:
     def __init__(self, skillName, useAPI):
@@ -14,7 +15,10 @@ class askDeepseek:
         ]
         if self.__useAPI == True:
             messageBody.append({"role": "user", "content": prompt})
-            response = self.__query(messageBody, 0, 450)
+            try:
+                response = self.__query(messageBody, 0, 450)
+            except:
+                response = ''
         else:
             print("VPA app:\n" + prompt + "\n")
             response = input("Deepseek:\n")
@@ -26,7 +30,7 @@ class askDeepseek:
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=10),
-        retry = retry_if_result_empty
+        retry = retry_if_result(retry_if_result_empty)
     )
     def __query(self, messageBody, tempr, maxt):
         client = OpenAI(api_key = self.apk_key, base_url = "https://api.deepseek.com")
@@ -39,6 +43,7 @@ class askDeepseek:
                 timeout = 60
             )
             result = response.choices[0].message.content.strip()
+            result = emoji.demojize(result)
             return result
         except Exception as e:
             print(f"Deepseek query error: {str(e)}")
