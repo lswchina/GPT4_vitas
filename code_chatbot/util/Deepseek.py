@@ -47,4 +47,4 @@ class askDeepseek:
             return result
         except Exception as e:
             print(f"Deepseek query error: {str(e)}")
-        return ''
+        return 'I don\'t know'
