@@ -386,6 +386,13 @@ class askChatGPT:
                     break
         else:
             response = ""
+            select_input = response.split("\n")[0]
+            select_input = select_input.strip()
+            select_input = select_input.strip("'")
+            select_input = select_input.strip('"')
+            if select_input not in candidate_input_list:
+                ind = random.randint(0, len(candidate_input_list) - 1)
+                select_input = candidate_input_list[ind]
         if select_input == '':
             select_input = self.step3_prompt2(response, [], candidate_input_list, self.__messageBody3)
         else:

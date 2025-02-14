@@ -5,7 +5,7 @@ import argparse
 from model.FSM import FSM
 import util.deal_with_UI as UI
 from util.Spider import Spider
-from util.ChatGPT import askChatGPT
+from util.Deepseek import askDeepseek
 import util.Constant as Constant
 from skill.Skill import Skill
 import step2_test_skill as test
@@ -13,10 +13,10 @@ import step2_test_skill as test
 def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", help = "input the begin index", dest = "index", type=int, default=1)
-    parser.add_argument("-ei", help = "input the end index", dest = "endindex", type=int, default=100)
+    parser.add_argument("-ei", help = "input the end index", dest = "endindex", type=int, default=1000)
     parser.add_argument("-c", help = "input the configuration file name", dest = "id", type=str, default="config004.ini")
-    parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "dataset_Vitas_plus.xlsx")
-    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/benchmark_elevate/")
+    parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "large_scale_4000.xlsx")
+    parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/large_scale_1/")
     parser.add_argument("-d", help = "input the chrome driver version", dest = "driver", type = str, default = "chromedriver_103")
     args = parser.parse_args()
     INDEX = args.index
@@ -94,7 +94,8 @@ if __name__ == '__main__':
             else:
                 INDEX = INDEX + 1
                 continue
-            gpt = askChatGPT(skill.skillName, skill_log_path, True, Constant.CONFIG_PATH)
+            # gpt = askChatGPT(skill.skillName, skill_log_path, True, Constant.CONFIG_PATH)
+            gpt = askDeepseek(skill.skillName, skill_log_path, True)
             fsm = FSM(gpt)
             test.generateTest(skill_log_path, result_path, spider, skill, gpt, fsm)
             UI.re_open_with_no_exit(spider)
