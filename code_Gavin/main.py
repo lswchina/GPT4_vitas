@@ -14,7 +14,7 @@ def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", help = "input the begin index", dest = "index", type=int, default=1)
     parser.add_argument("-ei", help = "input the end index", dest = "endindex", type=int, default=1000)
-    parser.add_argument("-c", help = "input the configuration file name", dest = "id", type=str, default="config004.ini")
+    parser.add_argument("-c", help = "input the configuration file name", dest = "id", type=str, default="config001.ini")
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "large_scale_4000.xlsx")
     parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/large_scale_1/")
     parser.add_argument("-d", help = "input the chrome driver version", dest = "driver", type = str, default = "chromedriver_103")

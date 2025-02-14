@@ -135,6 +135,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
         while Stop == False:
             skillStart = True
             Inpt, lastQuestion = ansSkill(i, output, fsm, rounds, request, lastQuestion, Inpt, time_before_testing, total_rounds + rounds)
+            rounds = rounds + 1
             print(Inpt)
             if Inpt.get_input() in Constant.StopSign:
                 Stop = True
@@ -175,7 +176,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
                     else:
                         permission_str = ','.join(skill.permission_list)
                         addProblem(os.path.join(res_dir, "problem2.txt"), skill.skillName + ": " + privacy + "(" + permission_str + ")")
-                rounds = rounds + 1
+                # rounds = rounds + 1
             
             #check is stopped
             alexa_response = getAlexa(request)
@@ -185,6 +186,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
                     Ques = Question("<END>")
                     fsm.addQuesToQuesSet(Ques)
                 fsm.updateFSM(lastQuestion, Inpt, Ques)
+                rounds = rounds + 1
                 lastQuestion = Ques
                 break
 
@@ -208,6 +210,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
                         Ques = Question("<END>")
                         fsm.addQuesToQuesSet(Ques)
                     fsm.updateFSM(lastQuestion, Inpt, Ques)
+                    rounds = rounds + 1
                     break
         if 'problem5' not in log and pro_detc.isUnavailable(skillStart, questions, skill.supportRegion):   #problem 5: unavailable skill
             log += "problem5----------unavailable skill!(" + str(total_rounds + rounds) + ")\n"

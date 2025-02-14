@@ -3,7 +3,7 @@ from openai import OpenAI
 import random
 from copy import deepcopy
 from openai import OpenAI
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_result
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_result
 
 class askDeepseek:
     def __init__(self, skillName, log_dir, useAPI):
@@ -37,7 +37,7 @@ class askDeepseek:
 
     @retry(
         stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=4, max=10),
+        wait=wait_fixed(3),
         retry = retry_if_result(retry_if_result_empty)
     )
     def __query(self, messageBody, tempr, maxt):
@@ -47,8 +47,7 @@ class askDeepseek:
                 model = "deepseek-chat",
                 messages = messageBody,
                 temperature = tempr,
-                max_tokens = maxt,
-                timeout = 60
+                max_tokens = maxt
             )
             result = response.choices[0].message.content.strip()
             return result

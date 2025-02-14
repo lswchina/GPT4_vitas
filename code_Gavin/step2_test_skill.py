@@ -69,6 +69,7 @@ def generateTest(skill_log_path, res_dir, spider, skill, gpt, fsm):
     endWithStop = False
     i = 0
     time_before_testing = time.time()
+    total_rounds = 0
     while i <= 2 and time.time() - time_before_testing < Constant.TIME_LIMIT:
         time_start = time.time()
         fileTest = os.path.join(skill_log_path, skillName_to_dirName + str(i) + ".txt")

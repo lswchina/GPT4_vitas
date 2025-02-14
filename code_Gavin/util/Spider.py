@@ -20,9 +20,9 @@ from distutils.version import StrictVersion
 class Spider:
     def __init__(self, config_path):
         chrome_options = Options()
-        chrome_options.add_argument('--no-sandbox')
+        '''chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
-        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--headless')'''
         if StrictVersion(selenium.__version__) < StrictVersion("4.0.0"):
             self.web_driver = webdriver.Chrome(options= chrome_options) #, executable_path=Constant.CHROME_PATH)
         else:
@@ -349,9 +349,12 @@ class Spider:
         self.web_driver.find_element(By.ID, 'ap_email').send_keys(self.username)
         self.web_driver.find_element(By.ID, 'ap_email').send_keys(Keys.ENTER)
         time.sleep(10)
-        self.web_driver.find_element(By.ID, 'ap_password').send_keys(self.password)
-        self.web_driver.find_element(By.ID, 'ap_password').send_keys(Keys.ENTER)
-        time.sleep(5)
+        try:
+            self.web_driver.find_element(By.ID, 'ap_password').send_keys(self.password)
+            self.web_driver.find_element(By.ID, 'ap_password').send_keys(Keys.ENTER)
+            time.sleep(5)
+        except:
+            pass
         if self.web_driver.current_url != "https://www.amazon.com/?ref_=nav_ya_signin":
             time.sleep(20)
             if self.web_driver.current_url.startswith("https://www.amazon.com/ap/cvf/transactionapproval"):
