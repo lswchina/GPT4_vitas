@@ -14,18 +14,18 @@ def getArgs():
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", help = "input the begin index", dest = "index", type=int, default=1)
     parser.add_argument("-ei", help = "input the end index", dest = "endindex", type=int, default=1000)
-    parser.add_argument("-c", help = "input the configuration file name", dest = "id", type=str, default="config001.ini")
+    parser.add_argument("-c", help = "input the configuration file id", dest = "id", type=str, default="1")
     parser.add_argument("-e", help = "input the name of an excel file in the dataset_2022 directory", dest = "excel_name", type = str, default = "large_scale_4000.xlsx")
     parser.add_argument("-l", help = "input the path to save logs", dest = "log_path", type = str, default = "../../output/large_scale_1/")
     parser.add_argument("-d", help = "input the chrome driver version", dest = "driver", type = str, default = "chromedriver_103")
     args = parser.parse_args()
     INDEX = args.index
     END_INDEX = args.endindex
-    CONFIG = args.id
-    EXCEL_PATH = "../dataset_2022/" + args.excel_name
+    CONFIG_ID = args.id
+    EXCEL_PATH = os.path.join(os.path.abspath(r".."), "dataset_2022", args.excel_name)
     LOG_PATH = args.log_path
     DRIVER = args.driver
-    return INDEX, END_INDEX, CONFIG, EXCEL_PATH, LOG_PATH, DRIVER
+    return INDEX, END_INDEX, CONFIG_ID, EXCEL_PATH, LOG_PATH, DRIVER
 
 def init_dir(LOG_PATH):
     if not os.path.exists('../cookie'):
@@ -33,14 +33,16 @@ def init_dir(LOG_PATH):
     if not os.path.exists(LOG_PATH):
         os.makedirs(LOG_PATH)
 
-def init_constant(config, driver):
-    Constant.CONFIG_PATH = os.path.join('../config', config)
-    if not os.path.exists(Constant.CONFIG_PATH):
-        print("config file does not exist!")
+def init_constant(config_id):
+    if len(config_id) == 1:
+        Constant.CONFIG_PATH = os.path.join(os.path.abspath(r".."), 'config', 'config00' + config_id + '.ini')
+    elif len(config_id) == 2:
+        Constant.CONFIG_PATH = os.path.join(os.path.abspath(r".."), 'config', 'config0' + config_id + '.ini')
+    else:
+        print("invalid configuration file id")
         sys.exit(-1)
     Constant.LOGOUT_URL = "https://www.amazon.com/ap/signin?_encoding=UTF8&openid.assoc_handle=usflex&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0&openid.pape.max_auth_age=0&openid.return_to=https%3A%2F%2Fwww.amazon.com%2Fgp%2Fyourstore%2Fhome%3Fie%3DUTF8%26action%3Dsign-out%26path%3D%252Fgp%252Fyourstore%252Fhome%26ref_%3Dnav_AccountFlyout_signout%26signIn%3D1%26useRedirectOnSuccess%3D1"
-    Constant.CHROME_PATH = "../chrome/" + driver
-    Constant.COOKIE_DIR = "../cookie/console_cookie7.pkl"
+    Constant.COOKIE_DIR = os.path.join(os.path.abspath(r".."), "cookie", "console_cookie7_" + config_id + ".pkl")
     Constant.WEB = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36'
     Constant.USER_AGENT = {'User-Agent':Constant.WEB,'Host':'www.amazon.com'}
     Constant.RE_DIC = {
@@ -67,11 +69,11 @@ def init_constant(config, driver):
     Constant.CONTEXT_RELATED_LABEL = "context-related"
 
 if __name__ == '__main__':
-    INDEX, END_INDEX, CONFIG, EXCEL_PATH, LOG_PATH, DRIVER = getArgs()
+    INDEX, END_INDEX, CONFIG_ID, EXCEL_PATH, LOG_PATH, DRIVER = getArgs()
     if not os.path.exists(EXCEL_PATH):
         print("the excel path does not exist")
         sys.exit()
-    init_constant(CONFIG, DRIVER)
+    init_constant(CONFIG_ID)
     init_dir(LOG_PATH)
     spider = Spider(Constant.CONFIG_PATH)
     UI.open_log_page(spider)
